@@ -33,10 +33,10 @@
                 </div>
                 <div class="form-group">
                   <label class="control-label" for='alivetest'>Alive Test</label>
-                  <select v-model="alivetest">
-                    <option value = 0  selected>Scan Config Default</option>
-                    <option value= 1>TCP-ACK Service Ping</option>
-                    <option value= 2>TCP-SYN Service Ping</option>
+                  <select class="form-control" v-model="alivetest">
+                    <option value = "0">Scan Config Default</option>
+                    <option value= "1">TCP-ACK Service Ping</option>
+                    <option value= "2">TCP-SYN Service Ping</option>
                     <option value="3">ARP Ping</option>
                     <option value="4">ICMP & TCP-ACK Service Ping</option>
                     <option value="5"> ICMP & ARP Ping</option>
@@ -58,6 +58,7 @@
                 <button type="submit" class="btn btn-primary">Save</button>
               </form>
           </div>
+          <div>{{targetData.id}}</div>
           <div class="modal-footer">
               
           </div>
@@ -81,7 +82,7 @@
     data() {
       return {
         port: [],
-        name: '',
+        name: this.targetData.length,
         comment: '',
         hosts: '',
         portlist: '',
@@ -122,12 +123,17 @@
   }
 </script>
 <style>
-#updateModal label{
-    min-width: 100px;
+#updateTarget .form-control{
+  display: unset;
+  width: 100%;
 }
-#updateModal .form-group{
-    display: flex;
-    align-items: center;
+#updateTarget .form-group{
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+#updateTarget label {
+    min-width: 125px;
 }
 .modal-open .modal {
     overflow-x: hidden;

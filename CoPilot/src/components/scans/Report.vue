@@ -2,15 +2,7 @@
   <section class="content">
     <div class="row">
       <div class="col-md-12">
-        <div class="box">
-          <div class="box-header">
-            <!-- <router-link to="/createtarget"><i class="fa fa-user-plus" style="margin-right: 3px"></i> CREATE</router-link> -->
-            <button data-toggle="modal" data-target="#addTask" @click="showModal">{{ $t('action.createMsg') }}</button>
-            <addTask v-show="isModalVisible"
-                          @close="closeModal"
-            />
-          </div>
-          <!-- /.box-header -->
+        <div class="box" v-if="report != null">
           <div class="box-body">
             <div class="dataTables_wrapper form-inline dt-bootstrap" id="example1_wrapper">
               <div class="row">
@@ -25,27 +17,31 @@
                 <div class="col-sm-12 table-responsive">
                   <table aria-describedby="example1_info" role="grid" id="example1" class="table table-bordered table-striped dataTable">
                     <thead>
-                      <tr role="row">
+                      <tr>
                         <!-- <th style="width: 30px" aria-sort="ascending" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Id</th> -->
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('tasks.nameMsg') }}</th>
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('tasks.status') }}</th>
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('tasks.report') }}</th>
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('tasks.lastReport') }}</th>
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('action.nameMsg') }}</th>
+                        <th rowspan="2" aria-controls="example1" tabindex="0">{{ $t('tasks.vul') }}</th>
+                        <th rowspan="2" aria-controls="example1" tabindex="0">{{ $t('tasks.severity') }}</th>
+                        <th rowspan="2" aria-controls="example1" tabindex="0">QoD</th>
+                        <th colspan="2" aria-controls="example1" tabindex="0" style="text-align: center">Host</th>
+                        <th rowspan="2" aria-controls="example1" tabindex="0" >{{ $t('tasks.location') }}</th>
+                        <th rowspan="2" aria-controls="example1" tabindex="0" >{{ $t('createMsg') }}</th>
                         <!-- <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0"></th> -->
+                      </tr>
+                      <tr>
+                        <th>IP</th>
+                        <th class="report-hostname" style="border-right-width: thin;">Name</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr class="odd" role="row" v-for="task in tasks" :key="task.id">
+                      <tr class="odd" role="row" v-for="r in report" :key="r.id">
                         <!-- <td class="sorting_1">{{user.ID}}</td> -->
-                        <td>{{task.name}}</td>
-                        <td></td>
-                        <td><router-link :to="{ name: 'Danh sách báo cáo', params: {id: task.uuid}}">{{task.rpnumber.String}}</router-link></td>
-                        <td>{{task.last_report}}</td>
-                        <td class="action-edit">
-                          <a style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
-                          <a> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
-                        </td>
+                        <td><router-link :to="{ name: 'Báo cáo', params: {id: report.uuid}}">{{r.vulnerability}}</router-link></td>
+                        <td>{{r.severity}}</td>
+                        <td>{{r.qod}}</td>
+                        <td>{{r.host.ip}}</td>
+                        <td>{{r.host.name}}</td>
+                        <td>{{r.location}}</td>
+                        <td>{{r.created}}</td>
                       </tr>
                     </tbody>
                     
@@ -66,6 +62,9 @@
             <!-- /.box-body -->
           </div>
         </div>
+        <div v-if="report == null">
+            <span> Not report </span>
+        </div>
       </div>
     </div>
   </section>
@@ -74,48 +73,30 @@
 <script>
 // import $ from 'jquery'
 import axios from 'axios'
-import addTask from './Create.vue'
 // Require needed datatables modules
 require('datatables.net')
 require('datatables.net-bs')
 
 export default {
   name: 'Tables',
-  components: {
-    addTask
-  },
+  props: ['id'],
   data() {
     return {
-      tasks: [],
+      report: [],
       pagination: [],
       page: 1,
       isModalVisible: false
     }
   },
   mounted() {
-    this.getTask(this.page)
+    this.getReport(this.page, this.id)
   },
-  // created() {
-  //   axios.get('http://localhost:8081/')
-  //   .then(response => {
-  //     let $this = this
-  //     this.users = response.data.records
-  //     $this.makePagination(response.data)
-  //     this.$nextTick(() => {
-  //       this.DataTable = $('#example1').DataTable(
-  //         // {
-  //         //   'pageLength': 11
-  //         // }
-  //       )
-  //     })
-  //   })
-  // },
   methods: {
-    getTask(page) {
-      axios.get('http://localhost:8081/tasks/page/' + page)
+    getReport(page, id) {
+      axios.get('http://localhost:8081/report/' + id + '/page/' + page)
       .then(response => {
         let $this = this
-        this.tasks = response.data.records
+        this.report = response.data.records
         $this.makePagination(response.data)
       })
     },
@@ -143,7 +124,7 @@ export default {
       this.pagination = pagination
     },
     fetchPaginate(page) {
-      this.getTask(page)
+      this.getReport(page, this.id)
     },
     openModal () {
 
@@ -190,11 +171,7 @@ table.dataTable thead .sorting_desc:after {
 .pagination span{
   margin: 0px 10px
 }
-#myModal .form-group{
-    display: flex;
-    align-items: center;
-}
-#myModal label{
-    min-width: 125px;
+.report-hostname {
+  border-right-width: thin;
 }
 </style>

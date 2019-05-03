@@ -5,7 +5,7 @@
     <section class="sidebar">
 
       <!-- Sidebar user panel (optional) -->
-      <div class="user-panel">
+      <!-- <div class="user-panel">
         <div class="pull-left image">
           <img :src="user.avatar" />
         </div>
@@ -17,10 +17,10 @@
             <i class="fa fa-circle text-success"></i> Online
           </a>
         </div>
-      </div>
+      </div> -->
 
       <!-- search form (Optional) -->
-      <form v-on:submit.prevent class="sidebar-form" id="searchForm">
+      <!-- <form v-on:submit.prevent class="sidebar-form" id="searchForm">
         <div class="input-group" id="searchContainer">
           <span class="input-group-btn">
             <input type="text"
@@ -35,7 +35,7 @@
             </button>
           </span>
         </div>
-      </form>
+      </form> -->
       <!-- /.search form -->
 
       <!-- Sidebar Menu -->
@@ -80,4 +80,5 @@ export default {
 #search-btn {
   width: 20%;
 }
+
 </style>

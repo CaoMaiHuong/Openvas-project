@@ -4,27 +4,27 @@
       <div class="box"  v-for="dt in detail" :key="dt.id">
         <div class="box-header">
           <div class="cve-list">
-              <h4><router-link :to="{name: 'Targets'}"><i class="fa fa-list"><span  style="margin-left:5px">Target List</span></i></router-link></h4>
+              <h4><router-link :to="{name: 'Targets'}"><i class="fa fa-list"><span  style="margin-left:5px">{{ $t('targets.targetListMsg') }}</span></i></router-link></h4>
           </div>
         </div>
         <div class="box-body">
           <div class="target-name">
             <h3>{{dt.name}}</h3>
               <span>ID: {{dt.uuid}}</span><br>
-              <span>Created: {{dt.created}}</span> <br>
-              <span>Modified: {{dt.modified}}</span><br>
+              <span>{{ $t('createMsg') }}: {{dt.created}}</span> <br>
+              <span>{{ $t('modifyMsg') }}: {{dt.modified}}</span><br>
           </div>
           <div class="target-infomation">
             <div class="host">
               <h3>Host</h3>
-              <span> Included:  {{dt.hosts}}<br></span>
-              <span> Reverse Lookup Only: {{dt.rlonly}}<br></span>
-              <span> Reverse Lookup Unify: {{dt.rlunify}}<br></span>
-              <span>Alive Test: {{dt.alivetest}}<br></span>
-              <span>Port List: {{dt.portlist}}</span>
+              <span> {{ $t('targets.includedMsg') }}:  {{dt.hosts}}<br></span>
+              <span> {{ $t('targets.rlOnlyMsg') }}: {{dt.rlonly}}<br></span>
+              <span> {{ $t('targets.rlUnifyMsg') }}: {{dt.rlunify}}<br></span>
+              <span> {{ $t('targets.aliveTestMsg') }}: {{dt.alivetest}}<br></span>
+              <span> {{ $t('targets.portMsg') }}: {{dt.portlist}}</span>
             </div>
             <div class="tasks-using">
-              <h3>Tasks using this Target</h3>
+              <h3>{{ $t('targets.tasksMsg') }}</h3>
               <div v-if='dt.task != null'>
                 <router-link v-for="t in dt.task" :key="t.id" :to="{ name: 'Task Detail', params: {id: t.id }}">{{t.name}}<br>
                 </router-link>

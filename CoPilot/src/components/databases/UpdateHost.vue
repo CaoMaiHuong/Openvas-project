@@ -69,6 +69,6 @@
     align-items: center;
 }
 #myModal label{
-    min-width: 100px;
+    min-width: 125px;
 }
 </style>

@@ -5,37 +5,38 @@
         <div class="modal-content">
           <div class="modal-header">
             <span class="modal-header__title">
-              New Target
+              Tạo mới target
             </span>
             <button type="button" class="close" data-dismiss="modal">&times;</button>  
           </div>
           <div class="modal-body">   
               <form v-on:submit.prevent="createTarget" class="create-user" style="padding: 0px">
                 <div class="form-group">
-                  <label class="control-label" for="name">Name</label>
-                  <input class="form-control" v-model="name" name="name" v-validate="'required'" placeholder="Enter ..." type="text">
-                  <span v-if="errors.has('name')">{{ errors.first('name') }}</span>
+                  <label class="control-label" for="name">{{ $t('targets.nameMsg') }}</label>
+                  <input class="form-control" v-model="name" name="name" v-validate="'required'" type="text">
+                  <span v-if="errors.has('name')" style="display: block">{{ errors.first('name') }}</span>
                 </div>
+                
                 <div class="form-group">
-                  <label class="control-label" for="comment">Comment</label>
+                  <label class="control-label" for="comment">{{ $t('commentMsg') }}</label>
                   <input v-model='comment' class="form-control" name='comment'>
                 </div>
                 <div class="form-group">
-                  <label class="control-label" for='password'>Host</label>
+                  <label class="control-label" for='password'>{{ $t('targets.hostMsg') }}</label>
                   <input v-model='hosts' class="form-control" name='host'>
                 </div>
                 <div class="form-group">
-                  <label class="control-label" for="port-list">Port List</label>
+                  <label class="control-label" for="port-list">{{ $t('targets.portMsg') }}</label>
                   <select class="form-control" v-model="portlist">
                     <option v-for="p in port" :key="p.id" v-bind:value="p.id">{{p.name}}</option>
                   </select>
                 </div>
                 <div class="form-group">
-                  <label class="control-label" for='alivetest'>Alive Test</label>
-                  <select v-model="alivetest">
-                    <option value = 0  selected>Scan Config Default</option>
-                    <option value= 1>TCP-ACK Service Ping</option>
-                    <option value= 2>TCP-SYN Service Ping</option>
+                  <label class="control-label" for='alivetest'>{{ $t('targets.aliveTestMsg') }}</label>
+                  <select class="form-control" v-model="alivetest">
+                    <option value = "0">Scan Config Default</option>
+                    <option value= "1">TCP-ACK Service Ping</option>
+                    <option value= "2">TCP-SYN Service Ping</option>
                     <option value="3">ARP Ping</option>
                     <option value="4">ICMP & TCP-ACK Service Ping</option>
                     <option value="5"> ICMP & ARP Ping</option>
@@ -45,21 +46,19 @@
                   </select>
                 </div>
                 <div class="form-group">
-                  <label class="control-label" for='rlonly'>Reverse Lookup Only</label>
-                  <input type="radio" name="reverse-only" v-model="rlonly" value=1>Yes<br>
-                  <input type="radio" name="reverse-only" v-model="rlonly" value=0 checked>No<br>
+                  <label class="control-label" for='rlonly' style="margin-right: 30px;">{{ $t('targets.rlOnlyMsg') }}</label>
+                  <input type="radio" name="reverse-only" v-model="rlonly" value=1 >Có<br>
+                  <input type="radio" name="reverse-only" v-model="rlonly" value=0 checked style="margin-left: 30px;">Không<br>
                 </div>
                 <div class="form-group">
-                  <label class="control-label" for='rlunify'>Reverse Lookup Unify</label>
-                  <input type="radio" name="reverse-unify" v-model="rlunify" value=1>Yes<br>
-                  <input type="radio" name="reverse-unify" v-model="rlunify" value=0 checked>No<br>
+                  <label class="control-label" for='rlunify' style="margin-right: 30px;">{{ $t('targets.rlUnifyMsg') }}</label>
+                  <input type="radio" name="reverse-unify" v-model="rlunify" value=1>Có<br>
+                  <input type="radio" name="reverse-unify" v-model="rlunify" value=0 checked style="margin-left: 30px;">Không<br>
                 </div>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary">Lưu</button>
               </form>
           </div>
-          <div class="modal-footer">
-              
-          </div>
+          
         </div>
       </div>
     </div>
@@ -75,10 +74,10 @@
         name: '',
         comment: '',
         hosts: '',
-        portlist: '',
-        alivetest: '',
-        rlonly: '',
-        rlunify: ''
+        portlist: '1',
+        alivetest: '0',
+        rlonly: '0',
+        rlunify: '0'
       }
     },
     mounted() {
@@ -92,21 +91,26 @@
         })
       },
       createTarget() {
-        axios({
-          method: 'post',
-          url: 'http://localhost:8081/target',
-          data: {
-            name: this.name,
-            comment: this.comment,
-            hosts: this.hosts,
-            portlist: this.portlist,
-            alivetest: this.alivetest,
-            rlonly: this.rlonly,
-            rlunify: this.rlunify
+        this.$validator.validateAll().then(res => {
+          if (res) {
+            axios({
+              method: 'post',
+              url: 'http://localhost:8081/target',
+              data: {
+                name: this.name,
+                comment: this.comment,
+                hosts: this.hosts,
+                portlist: this.portlist,
+                alivetest: this.alivetest,
+                rlonly: this.rlonly,
+                rlunify: this.rlunify
+              }
+            })
+            .then(response => {
+              // // this.$router.push('/targets')
+              // this.$router.go(0)
+            })
           }
-        })
-        .then(response => {
-          this.$router.push('/targets')
         })
       }
     }
@@ -118,6 +122,6 @@
     align-items: center;
 }
 #myModal label{
-    min-width: 100px;
+    min-width: 125px;
 }
 </style>

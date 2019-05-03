@@ -16,17 +16,22 @@
                   </div>
                 </div>
               </div>
-
+              <div class="search">
+                <form v-on:submit.prevent="searchCpes()" class="search-form">
+                  <input class="search-content" v-model="search" type="text" placeholder="Tìm kiếm theo tiêu đề">
+                  <input class="se" type="submit" value="Tìm kiếm">
+                </form>
+              </div>
               <div class="row">
                 <div class="col-sm-12 table-responsive">
                   <table aria-describedby="example1_info" role="grid" id="example1" class="table table-bordered table-striped dataTable">
                     <thead>
                       <tr role="row">
-                        <th style="width: 30%" aria-sort="ascending" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Name</th>
-                        <th style="width: 30%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Title</th>
-                        <th style="width: 20%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Modified</th>
+                        <th style="width: 30%" aria-sort="ascending" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('cpes.nameMsg') }}</th>
+                        <th style="width: 30%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('cpes.titleMsg') }}</th>
+                        <th style="width: 20%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('modifyMsg') }}</th>
                         <th style="width: 10%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Cves</th>
-                        <th style="width: 10%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Severity</th>
+                        <th style="width: 10%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('severityMsg') }}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -74,15 +79,37 @@ export default {
     return {
       cpes: [],
       pagination: [],
-      page: 1
+      page: 1,
+      search: ''
     }
   },
   mounted() {
-    this.getCpe(this.page)
+    this.getCpes(this.page)
   },
   methods: {
-    getCpe(page) {
-      axios.get('http://localhost:8081/cpes/page/' + page)
+    getCpes(page) {
+      axios({
+        method: 'get',
+        url: 'http://localhost:8081/cpes/page/' + page
+      })
+      .then(response => {
+        let $this = this
+        this.cpes = response.data.records
+        $this.makePagination(response.data)
+      })
+    },
+    searchCpes() {
+      if (this.search === '') {
+        this.getCpes(this.page)
+      }
+      // axios.get('http://localhost:8081/cpes/page/' + page)
+      axios({
+        method: 'get',
+        url: 'http://localhost:8081/cpes/page/' + this.page + '/search/' + this.search,
+        data: {
+          search: this.search
+        }
+      })
       .then(response => {
         let $this = this
         this.cpes = response.data.records
@@ -99,7 +126,7 @@ export default {
       this.pagination = pagination
     },
     fetchPaginate(page) {
-      this.getCpe(page)
+      this.getCpes(page)
     }
   }
 }
@@ -142,5 +169,8 @@ table.dataTable thead .sorting_desc:after {
 }
 .pagination span{
   margin: 0px 10px
+}
+.search-form{
+  padding: 0px;
 }
 </style>

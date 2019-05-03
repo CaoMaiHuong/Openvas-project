@@ -8,7 +8,7 @@ import VueRouter from 'vue-router'
 import { sync } from 'vuex-router-sync'
 import routes from './routes'
 import store from './store'
-
+import i18n from '@/plugins/i18n'
 // Import Helpers for filters
 import { domain, count, prettyDate, pluralize } from './filters'
 
@@ -70,6 +70,7 @@ new Vue({
   el: '#root',
   router: router,
   store: store,
+  i18n,
   render: h => h(AppView)
 })
 

@@ -5,32 +5,32 @@
       <div class="box"  v-for="dt in detail" :key="dt.id">
         <div class="box-header">
           <div class="cve-list">
-              <h4><router-link :to="{name: 'Cves'}"><i class="fa fa-list"><span  style="margin-left:5px">CVE List</span></i></router-link></h4>
-          </div>
+              <h4><router-link :to="{name: 'Cves'}"><i class="fa fa-list"><span  style="margin-left:5px">{{ $t('cves.cveListMsg') }}</span></i></router-link></h4>
+          </div> 
         </div>
         <div class="box-body">
           <div class="cve-name">
             <h3>{{dt.name}}</h3>
               <span>ID: {{dt.name}}</span><br>
-              <span>Published: {{dt.published}}</span> <br>
-              <span>Last updated: {{dt.modified}}</span><br>
+              <span>{{ $t('publishMsg') }}: {{dt.published}}</span> <br>
+              <span>{{ $t('lastUpdate') }}: {{dt.modified}}</span><br>
           
           </div>
           <div class="cve-infomation">
             <div class="cve-description">
-              <h3>Description</h3>
+              <h3>{{ $t('cves.descripMsg') }}</h3>
               <div>{{dt.description}}</div>
             </div>
             <div class="cvss">
               <h3>CVSS</h3>
-              <span> Base Score:  {{dt.severity.String}}</span>
+              <span> {{ $t('cves.baseScoreMsg') }}Base Score:  {{dt.severity.String}}</span>
               <div v-if="dt.severity.String != 'N/A'">
-                <div><span>Access Vector: {{dt.vector}}</span></div>
-                <div><span>Access Complexity: {{dt.complexity}}</span></div>
-                <div><span>Authentication: {{dt.authentication}}</span></div>
-                <div><span>Confidentiality Impact: {{dt.confidentiality_impact}}</span></div>
-                <div><span>Integrity Impact: {{dt.integrity_impact}}</span></div>
-                <div><span>Availability Impact: {{dt.availability_impact}}</span></div>
+                <div><span>{{ $t('cves.vectorMsg') }}Access Vector: {{dt.vector}}</span></div>
+                <div><span>{{ $t('cves.complexityMsg') }}Access Complexity: {{dt.complexity}}</span></div>
+                <div><span>{{ $t('cves.authenticationMsg:') }}Authentication: {{dt.authentication}}</span></div>
+                <div><span>{{ $t('cves.confidentialityImpactMsg') }}Confidentiality Impact: {{dt.confidentiality_impact}}</span></div>
+                <div><span>{{ $t('cves.integrityImpactMsg') }}Integrity Impact: {{dt.integrity_impact}}</span></div>
+                <div><span>{{ $t('cves.availabilityImpactMsg') }}Availability Impact: {{dt.availability_impact}}</span></div>
               </div>
             </div>
             <!-- <div v-if='dt.product != ""'>
@@ -38,14 +38,14 @@
               <div><router-link v-for="pr in dt.product" :key="pr" :to="{ name: 'Cve Detail', params: {name: cve }}">{{pr}}<br></router-link></div>
             </div> -->
             <div >
-              <h3>Vulnerable Products</h3>
+              <h3>{{ $t('cves.vulProductMsg') }}</h3>
               <div v-if='dt.vulnerableProduct != null'>
                 <router-link v-for="pr in dt.vulnerableProduct" :key="pr.id" :to="{ name: 'Cpe Detail', params: {id: pr.id }}">{{pr.name}}<br>
                 </router-link>
               </div>
               <div v-if='dt.vulnerableProduct == null'>None</div>
             </div>
-            <h3>NVTs addressing this CVE</h3>
+            <h3>{{ $t('cves.nvtAddressMsg') }}</h3>
             <div v-if='dt.nvt != null'>
               <router-link v-for="n in dt.nvt" :key="n.nvt_id" :to="{ name: 'Nvt Detail', params: {id: n.nvt_id}}">{{n.nvt_name}}<br></router-link></div>
             </div>

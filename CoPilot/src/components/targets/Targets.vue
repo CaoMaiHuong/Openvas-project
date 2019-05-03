@@ -5,7 +5,7 @@
         <div class="box">
           <div class="box-header">
             <!-- <router-link to="/createtarget"><i class="fa fa-user-plus" style="margin-right: 3px"></i> CREATE</router-link> -->
-            <button data-toggle="modal" data-target="#myModal" @click="showModal">Add Target</button>
+            <button data-toggle="modal" data-target="#myModal" @click="showModal">{{ $t('action.createMsg') }}</button>
             <modal
               v-show="isModalVisible"
               @close="closeModal"
@@ -28,10 +28,10 @@
                     <thead>
                       <tr role="row">
                         <!-- <th style="width: 30px" aria-sort="ascending" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Id</th> -->
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Name</th>
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Hosts</th>
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Port List</th>
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Action</th>
+                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('targets.nameMsg') }}</th>
+                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('targets.hostMsg') }}</th>
+                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('targets.portMsg') }}</th>
+                        <th colspan="1" width="20%" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('action.nameMsg') }}</th>
                         <!-- <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0"></th> -->
                       </tr>
                     </thead>
@@ -45,8 +45,8 @@
                         <td>{{target.portlist}}</td>
                         <td class="action-edit">  
                           <updatemodal v-show="isModalVisible" @close="closeModal" :targetData="modalData" />                    
-                          <a data-toggle="modal" data-target="#updateTarget" @click="showUpdateModal(target)" style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>Edit</a>
-                          <a @click="deleteTarget(target.id)"> <i class="fa fa-trash" style="margin-right: 5px"></i>Delete</a>
+                          <a data-toggle="modal" data-target="#updateTarget" @click="showUpdateModal(target)" style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
+                          <a @click="deleteTarget(target.id)"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
                         </td>
                       </tr>
                     </tbody>
@@ -56,9 +56,11 @@
                     </tfoot>
                   </table>
                   <div class="pagination">
-                    <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.prev_page)" :disabled="pagination.prev_page == pagination.page">Previous</button>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate(1)" :disabled="pagination.page == 1"><i class="fa fa-angle-double-left"></i></button>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.prev_page)" :disabled="pagination.page == 1"><i class="fa fa-angle-left"></i></button>
                     <span>Page {{ pagination.page }} of {{ pagination.total_page }} </span>
-                    <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.next_page)" :disabled="pagination.next_page == pagination.page">Next</button>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.next_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-right"></i></button>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.total_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-double-right"></i></button>
                   </div>
                 </div>
               </div>
@@ -122,7 +124,7 @@ export default {
       this.$router.push('/targets')
     },
     deleteTarget(id) {
-      if (confirm('Do you really want to delete it?')) {
+      if (confirm('Bạn có chắc chắn muốn xóa?')) {
         axios({
           method: 'delete',
           url: 'http://localhost:8081/target/' + id

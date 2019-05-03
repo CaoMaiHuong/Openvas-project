@@ -4,7 +4,7 @@
       <div class="col-md-12">
         <div class="box">
           <div class="box-header">
-            <div data-toggle="modal" data-target="#myModal" @click="showModal"><i class="fa fa-user-plus" style="margin-right: 3px"></i> CREATE</div>
+            <div data-toggle="modal" data-target="#myModal" @click="showModal"><i class="fa fa-user-plus" style="margin-right: 3px"></i>{{ $t('action.createMsg') }}</div>
             <modal v-show="isModalVisible"/>
           </div>
           <div class="box-body">
@@ -14,12 +14,12 @@
                   <table aria-describedby="example1_info" role="grid" id="example1" class="table table-bordered table-striped dataTable">
                     <thead>
                       <tr role="row">
-                        <th style="width: 26%" aria-sort="ascending" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Name</th>
-                        <th style="width: 13%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Hostname</th>
-                        <th style="width: 13%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">IP Address</th>
-                        <th style="width: 7%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Severity</th>
-                        <th style="width: 13%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Modified</th>
-                        <th style="width: 7%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Action</th>
+                        <th style="width: 10%" aria-sort="ascending" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('hosts.nameMsg') }}</th> 
+                        <th style="width: 13%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('hosts.hostnameMsg') }}</th>
+                        <th style="width: 13%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('hosts.ipMsg') }}</th>
+                        <th style="width: 6%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('severityMsg') }}</th>
+                        <th style="width: 15%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('modifyMsg') }}</th>
+                        <th style="width: 9%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('action.nameMsg') }}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -33,8 +33,8 @@
                         <td>{{host.modified}}</td>
                         <td class="action-edit">
                           <updatemodal v-show="isModalVisible" :hostData="modalData" />                    
-                          <a data-toggle="modal" data-target="#updateHost" @click="showUpdateModal(host)" style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>Edit</a>
-                          <a @click="deleteHost(host.id)"> <i class="fa fa-trash" style="margin-right: 5px"></i>Delete</a>
+                          <a data-toggle="modal" data-target="#updateHost" @click="showUpdateModal(host)" style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
+                          <a @click="deleteHost(host.id)"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
                         </td>
                       </tr>
                     </tbody>

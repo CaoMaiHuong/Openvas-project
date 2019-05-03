@@ -5,18 +5,18 @@
       <form @submit.prevent="checkCreds">
         <div class="input-group">
           <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-          <input class="form-control" name="name" placeholder="Username" type="text" v-model="name">
+          <input class="form-control" name="name" placeholder="Tên đăng nhập" type="text" v-model="name">
         </div>
 
         <div class="input-group">
           <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-          <input class="form-control" name="password" placeholder="Password" type="password" v-model="password">
+          <input class="form-control" name="password" placeholder="Mật khẩu" type="password" v-model="password">
         </div>
         <span style="color:red"> {{ message }}</span>
         <br>
-        <button type="submit" v-bind:class="'btn btn-primary btn-lg '">Login</button>
-        <div class="signup">Don't have an account yet ?
-          <router-link to="/signup">Signup</router-link>
+        <button type="submit" v-bind:class="'btn btn-primary btn-lg'">Đăng nhập</button>
+        <div class="signup">Bạn chưa có tài khoản?
+          <router-link to="/signup">Đăng ký</router-link>
         </div>
       </form>
 
@@ -42,6 +42,7 @@ export default {
       axios({
         method: 'post',
         url: 'http://localhost:8081/login',
+        // withCredentials: true,
         data: {
           password: this.password,
           name: this.name
@@ -51,10 +52,9 @@ export default {
         if (response.data === 'Login successful') {
           let name = this.name
           window.localStorage.setItem('name', name)
-          // window.sessionStorage.setItem('email', email)
           this.$router.push('/')
         } else {
-          this.message = response.data
+          this.message = 'Tên đăng nhập hoặc mât khẩu không chính xác'
         }
       })
     }

@@ -22,13 +22,13 @@
                   <table aria-describedby="example1_info" role="grid" id="example1" class="table table-bordered table-striped dataTable">
                     <thead>
                       <tr role="row">
-                        <th style="width: 25%" aria-sort="ascending" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Name</th>
-                        <th style="width: 13%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Family</th>
-                        <th style="width: 13%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Created</th>
-                        <th style="width: 13%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Modified</th>
+                        <th style="width: 25%" aria-sort="ascending" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('nvts.nameMsg') }}</th>
+                        <th style="width: 13%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('nvts.familyMsg') }}</th>
+                        <th style="width: 13%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('createMsg') }}</th>
+                        <th style="width: 13%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('modifyMsg') }}</th>
                         <th style="width: 23%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">CVE</th>
-                        <th style="width: 6%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Severity</th>
-                        <th style="width: 7%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Qod</th>
+                        <th style="width: 6%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('severityMsg') }}</th>
+                        <th style="width: 7%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('nvts.qodMsg') }}</th>
                         <!-- <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0"></th> -->
                       </tr>
                     </thead>

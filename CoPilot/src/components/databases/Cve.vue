@@ -22,15 +22,15 @@
                   <table aria-describedby="example1_info" role="grid" id="example1" class="table table-bordered table-striped dataTable">
                     <thead>
                       <tr role="row">
-                        <th style="width: 12%" aria-sort="ascending" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Name</th>
-                        <th style="width: 11%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Vector</th>
-                        <th style="width: 11%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Complexity</th>
-                        <th style="width: 11%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Authentication</th>
-                        <th style="width: 11%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Confidentiality Impact</th>
-                        <th style="width: 11%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Integrity Impact</th>
-                        <th style="width: 11%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Availability Impact</th>
-                        <th style="width: 11%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Published</th>
-                        <th style="width: 11%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Severity</th>
+                        <th style="width: 12%" aria-sort="ascending" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('cves.nameMsg') }}</th>
+                        <th style="width: 11%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('cves.vectorMsg') }}</th>
+                        <th style="width: 11%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('cves.complexityMsg') }}</th>
+                        <th style="width: 11%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('cves.authenticationMsg') }}</th>
+                        <th style="width: 11%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('cves.confidentialityImpactMsg') }}</th>
+                        <th style="width: 11%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('cves.integrityImpactMsg') }}</th>
+                        <th style="width: 11%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('cves.availabilityImpactMsg') }}</th>
+                        <th style="width: 11%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('publishMsg') }}</th>
+                        <th style="width: 11%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('severityMsg') }}</th>
                         <!-- <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0"></th> -->
                       </tr>
                     </thead>
@@ -48,7 +48,7 @@
                         <td>{{cve.published}}</td>
                         <td>{{cve.severity.String}}</td>
                       </tr>
-                      <tr class="odd" role="row" >
+                      <tr class="cve-description" role="row" >
                         <td colspan = "8">{{cve.description}}</td>
                       </tr>
                     </tbody>
@@ -170,5 +170,8 @@ table.dataTable thead .sorting_desc:after {
 }
 .pagination span{
   margin: 0px 10px
+}
+.cve-description {
+  background-color: #f9f9f9;
 }
 </style>

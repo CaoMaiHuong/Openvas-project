@@ -67,10 +67,24 @@ type loginn struct {
 }
 
 type Dashboard struct {
-	UserNumber int `json:"userNumber`
-	NvtNumber  int `json:"nvtNumber`
-	CveNumber  int `json:"cveNumber`
-	CpeNumber  int `json:"cpeNumber`
+	UserNumber string `json:"userNumber"`
+	NvtNumber  string `json:"nvtNumber"`
+	CveNumber  string `json:"cveNumber"`
+	CpeNumber  string `json:"cpeNumber"`
+}
+
+type BySeverity struct {
+	Total  int `json:"total"`
+	High   int `json:"high"`
+	Medium int `json:"medium"`
+	Low    int `json:"low"`
+	Log    int `json:"log"`
+	NA     int `json:"na"`
+}
+
+type Roles struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
 }
 
 type User struct {
@@ -115,12 +129,38 @@ type Target struct {
 }
 
 type Task struct {
-	Id       int    `json:"id"`
-	Uuid     string `json:"uuid"`
-	Name     string `json:"name"`
-	Status   string `json:"status"`
-	Reports  string `json:"report"`
-	Severity string `json:"severity"`
+	Id           int            `json:"id"`
+	Uuid         string         `json:"uuid"`
+	Name         string         `json:"name"`
+	Status       string         `json:"status"`
+	ReportNumber sql.NullString `json:"rpnumber"`
+	// Reports      string         `json:"report"`
+	LastReport string `json:"last_report"`
+	Severity   string `json:"severity"`
+}
+
+type Report struct {
+	Id       int        `json:"id"`
+	Uuid     string     `json:"uuid"`
+	Status   string     `json:"status"`
+	Date     string     `json:"date"`
+	Task     string     `json:"task"`
+	Severity string     `json:"severity"`
+	Rank     BySeverity `json:"rank"`
+}
+type HostResult struct {
+	Ip   string `json:"ip"`
+	Name string `json:"name"`
+}
+type Result struct {
+	Id            int        `json:"id"`
+	Uuid          string     `json:"uuid"`
+	Vulnerability string     `json:"vulnerability"`
+	Severity      string     `json:"severity"`
+	QoD           string     `json:"qod"`
+	Host          HostResult `json:"host"`
+	Location      string     `json:"location"`
+	Created       string     `json:"created"`
 }
 
 type NvtInfo struct {
@@ -228,15 +268,93 @@ type Paginator struct {
 
 func getDashboard(w http.ResponseWriter, r *http.Request) {
 	var dashboard Dashboard
-	// var dashboards []Dashboard
-	db.Raw("Select count(*) from users").Scan(&dashboard.UserNumber)
-	db.Raw("Select count(*) from nvts").Scan(&dashboard.NvtNumber)
-	db.Raw("Select count(*) from scap.cves").Scan(&dashboard.CveNumber)
-	db.Raw("Select count(*) from scap.cpes").Scan(&dashboard.CpeNumber)
+	var dashboards []Dashboard
+	// rows, err := db.Raw("Select count(*) from users").Rows()
+	// Scan(&dashboard.UserNumber)
+	rows, err := db.Raw("Select count(*) from nvts").Rows()
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	for rows.Next() {
+		err = rows.Scan(&dashboard.NvtNumber)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+	}
+	rows1, err := db.Raw("Select count(*) from scap.cves").Rows()
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	for rows1.Next() {
+		err = rows1.Scan(&dashboard.CveNumber)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+
+	}
+	// Scan(&dashboard.NvtNumber)
+	rows2, err := db.Raw("Select count(*) from scap.cpes").Rows()
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	for rows2.Next() {
+		err = rows2.Scan(&dashboard.CpeNumber)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+	}
+	// db.Raw("Select count(*) from scap.cpes").Scan(&dashboard.CpeNumber)
 	// dashboards = append(dashboards, dashboard)
-	json.NewEncoder(w).Encode(dashboard)
+	dashboards = append(dashboards, dashboard)
+	json.NewEncoder(w).Encode(dashboards)
 }
 
+func cveBySeverity(w http.ResponseWriter, r *http.Request) {
+	rows, err := db.Raw("SELECT count(*), sum(case when cvss between 7.0 and 10 then 1 else 0 end) as high, sum(case when  cvss between 4.0 and 6.9 then 1 else 0 end) as medium, sum(case when  cvss between 0.1 and 3.9 then 1 else 0 end) as low, sum(case when  cvss = 0 then 1 else 0 end) as log, sum(case when  cvss is null then 1 else 0 end) as na from scap.cves").Rows()
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	var cve BySeverity
+	// var cves []CveBySeverity
+	for rows.Next() {
+		err = rows.Scan(&cve.Total, &cve.High, &cve.Medium, &cve.Low, &cve.Log, &cve.NA)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+	}
+	// db.Raw("Select count(*) from scap.cpes").Scan(&dashboard.CpeNumber)
+	// dashboards = append(dashboards, dashboard)
+	// cves = append(cves, cve)
+	json.NewEncoder(w).Encode(cve)
+}
+func nvtBySeverity(w http.ResponseWriter, r *http.Request) {
+	rows, err := db.Raw("SELECT count(*),sum(case when CAST(cvss_base as double precision) between 7.0 and 10 then 1 else 0 end) as high, sum(case when CAST(cvss_base as double precision) between 4.0 and 6.9 then 1 else 0 end) as medium, sum(case when CAST(cvss_base as double precision) between 0.1 and 3.9 then 1 else 0 end) as low, sum(case when CAST(cvss_base as double precision) = 0 then 1 else 0 end) as log, sum(case when CAST(cvss_base as double precision) is null then 1 else 0 end) as NA from nvts").Rows()
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	var nvt BySeverity
+	// var cves []CveBySeverity
+	for rows.Next() {
+		err = rows.Scan(&nvt.Total, &nvt.High, &nvt.Medium, &nvt.Low, &nvt.Log, &nvt.NA)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+	}
+	// db.Raw("Select count(*) from scap.cpes").Scan(&dashboard.CpeNumber)
+	// dashboards = append(dashboards, dashboard)
+	// cves = append(cves, cve)
+	json.NewEncoder(w).Encode(nvt)
+}
 func allTargets(w http.ResponseWriter, r *http.Request) {
 
 	// var paginator Paginator
@@ -368,15 +486,6 @@ func createTarget(w http.ResponseWriter, r *http.Request) {
 	var modified = time.Now().Unix()
 
 	db.Exec("INSERT INTO targets(uuid,name, hosts, reverse_lookup_only, reverse_lookup_unify, comment, port_list, alive_test, creation_time, modification_time) VALUES (?,?,?,?,?,?,?,?,?,?)", &u, &target.Name, &target.Hosts, &target.RLOnly, &target.RLUnify, &target.Comment, &target.PortList, &target.AliveTest, &created, &modified)
-	// if err != nil {
-	// 	log.Print(err)
-	// 	return
-	// } else {
-	// 	fmt.Fprintf(w, "Create Successful")
-	// }
-
-	// db.Create(&target)
-
 }
 
 func updateTarget(w http.ResponseWriter, r *http.Request) {
@@ -431,11 +540,6 @@ func allPortList(w http.ResponseWriter, r *http.Request) {
 }
 
 func allTasks(w http.ResponseWriter, r *http.Request) {
-	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
-	// var paginator Paginator
 	var tasks []Task
 	vars := mux.Vars(r)
 	page, err := strconv.Atoi(vars["page"])
@@ -448,7 +552,7 @@ func allTasks(w http.ResponseWriter, r *http.Request) {
 		offset = (page - 1) * limit
 	}
 
-	rows, err := db.Raw("SELECT id, uuid, name FROM tasks WHERE hidden = 0 LIMIT ? OFFSET ?", limit, offset).Rows()
+	rows, err := db.Raw("SELECT t.id, t.uuid, t.name, r.count as reports, r.max as date FROM tasks t LEFT JOIN (select task, count(id), max(date) from reports group by task) as r ON t.id = r.task WHERE hidden = 0 LIMIT ? OFFSET ?", limit, offset).Rows()
 	if err != nil {
 		log.Print(err)
 		return
@@ -456,10 +560,22 @@ func allTasks(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		var task Task
-		err = rows.Scan(&task.Id, &task.Uuid, &task.Name)
+		var last sql.NullString
+		err = rows.Scan(&task.Id, &task.Uuid, &task.Name, &task.ReportNumber, &last)
 		if err != nil {
 			log.Print(err)
 			return
+		}
+
+		if last.Valid == false {
+			last.String = ""
+			task.LastReport = last.String
+		} else {
+			i, err := strconv.ParseInt(last.String, 10, 64)
+			if err != nil {
+				panic(err)
+			}
+			task.LastReport = time.Unix(i, 0).Format(time.RFC850)
 		}
 		tasks = append(tasks, task)
 	}
@@ -471,18 +587,117 @@ func allTasks(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(paginator)
 }
 
+func reportByTask(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	taskId := vars["uuid"]
+	page, err := strconv.Atoi(vars["page"])
+	var reports []Report
+	var offset int
+	limit := 10
+	if page == 1 {
+		offset = 0
+	} else {
+		offset = (page - 1) * limit
+	}
+	rows, err := db.Raw("select r.id, r.uuid, r.date, t.name from reports r inner join tasks t on r.task = t.id where t.uuid = ? LIMIT ? OFFSET ?", taskId, limit, offset).Rows()
+	if err != nil {
+		log.Print(err)
+		return
+	}
+
+	for rows.Next() {
+		var report Report
+		err = rows.Scan(&report.Id, &report.Uuid, &report.Date, &report.Task)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		i, err := strconv.ParseInt(report.Date, 10, 64)
+		if err != nil {
+			panic(err)
+		}
+		report.Date = time.Unix(i, 0).Format(time.RFC850)
+
+		rows1, err := db.Raw("SELECT sum(case when severity between 7.0 and 10 then 1 else 0 end) as high, sum(case when severity between 4.0 and 6.9 then 1 else 0 end) as medium, sum(case when severity between 0.1 and 3.9 then 1 else 0 end) as low, sum(case when severity = 0 then 1 else 0 end) as log, sum(case when severity is null then 1 else 0 end) as NA from results where report = ?", report.Id).Rows()
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		for rows1.Next() {
+			var rp BySeverity
+			err = rows1.Scan(&rp.High, &rp.Medium, &rp.Low, &rp.Log, &rp.NA)
+			if err != nil {
+				log.Print(err)
+				return
+			}
+			report.Rank = rp
+		}
+
+		reports = append(reports, report)
+	}
+
+	var count int
+	row := db.Raw("select count(*) from reports r inner join tasks t on r.task = t.id where t.uuid = ?", taskId).Row() // (*sql.Row)
+	row.Scan(&count)
+	paginator := Paging(page, limit, offset, count, &reports)
+	json.NewEncoder(w).Encode(paginator)
+}
+
+func getReport(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	reportId := vars["uuid"]
+	page, err := strconv.Atoi(vars["page"])
+	var results []Result
+	var ip string
+	var name string
+	var offset int
+	limit := 10
+	if page == 1 {
+		offset = 0
+	} else {
+		offset = (page - 1) * limit
+	}
+	rows, err := db.Raw("select r.id, r.uuid, n.name, r.severity, r.qod, r.host, r.hostname, r.port, r.date from results r inner join nvts n on r.nvt = n.uuid inner join reports on r.report = reports.id where r.severity>=0 and reports.uuid = ? LIMIT ? OFFSET ?", reportId, limit, offset).Rows()
+	if err != nil {
+		log.Print(err)
+		return
+	}
+
+	for rows.Next() {
+		var result Result
+		err = rows.Scan(&result.Id, &result.Uuid, &result.Vulnerability, &result.Severity, &result.QoD, &ip, &name, &result.Location, &result.Created)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		i, err := strconv.ParseInt(result.Created, 10, 64)
+		if err != nil {
+			panic(err)
+		}
+		result.Created = time.Unix(i, 0).Format(time.RFC850)
+		c := " %"
+		// fmt.Println(s + string(c));
+		result.QoD = result.QoD + string(c)
+		var host HostResult
+		host.Ip = ip
+		host.Name = name
+		result.Host = host
+		results = append(results, result)
+	}
+	var count int
+	row := db.Raw("select count(*) from results r inner join reports on r.report = reports.id where r.severity >=0 and reports.uuid = ?", reportId).Row() // (*sql.Row)
+	row.Scan(&count)
+	paginator := Paging(page, limit, offset, count, &results)
+	json.NewEncoder(w).Encode(paginator)
+}
+
 func allNvts(w http.ResponseWriter, r *http.Request) {
-	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
-	// var paginator Paginator
 	var nvts []Nvt
 	vars := mux.Vars(r)
 	page, err := strconv.Atoi(vars["page"])
 
 	var offset int
-	limit := 10
+	limit := 5
 	if page == 1 {
 		offset = 0
 	} else {
@@ -623,7 +838,7 @@ func allCves(w http.ResponseWriter, r *http.Request) {
 	page, err := strconv.Atoi(vars["page"])
 
 	var offset int
-	limit := 10
+	limit := 4
 	if page == 1 {
 		offset = 0
 	} else {
@@ -757,15 +972,13 @@ func getCve(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func allCpes(w http.ResponseWriter, r *http.Request) {
-	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
+func searchCpes(w http.ResponseWriter, r *http.Request) {
 	var cpes []Cpe
+	// var search string
+	// _ = json.NewDecoder(r.Body).Decode(&search)
 	vars := mux.Vars(r)
+	search := vars["search"]
 	page, err := strconv.Atoi(vars["page"])
-
 	var offset int
 	limit := 10
 	if page == 1 {
@@ -773,7 +986,52 @@ func allCpes(w http.ResponseWriter, r *http.Request) {
 	} else {
 		offset = (page - 1) * limit
 	}
+	rows, err := db.Raw("SELECT id, name, title, modification_time, cve_refs, max_cvss FROM scap.cpes WHERE Lower(title) LIKE '%'  || lower(?) || '%' LIMIT ? OFFSET ?", search, limit, offset).Rows()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for rows.Next() {
+		var cpe Cpe
+		err = rows.Scan(&cpe.Id, &cpe.Name, &cpe.Title, &cpe.Modified, &cpe.Cves, &cpe.Severity)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		i, err := strconv.ParseInt(cpe.Modified, 10, 64)
+		if err != nil {
+			panic(err)
+		}
+		cpe.Modified = time.Unix(i, 0).Format(time.RFC850)
 
+		if cpe.Title.Valid == false {
+			cpe.Title.String = "N/A"
+		}
+		if cpe.Severity.Valid == false {
+			cpe.Severity.String = "N/A"
+		}
+
+		cpes = append(cpes, cpe)
+	}
+
+	var count int
+	row := db.Raw("SELECT count(*) FROM scap.cpes WHERE Lower(title) LIKE '%'  || lower(?) || '%'", search).Row() // (*sql.Row)
+	row.Scan(&count)
+	paginator := Paging(page, limit, offset, count, &cpes)
+	json.NewEncoder(w).Encode(paginator)
+}
+func allCpes(w http.ResponseWriter, r *http.Request) {
+	var cpes []Cpe
+	// var search string
+	// _ = json.NewDecoder(r.Body).Decode(&search)
+	vars := mux.Vars(r)
+	page, err := strconv.Atoi(vars["page"])
+	var offset int
+	limit := 10
+	if page == 1 {
+		offset = 0
+	} else {
+		offset = (page - 1) * limit
+	}
 	rows, err := db.Raw("SELECT id, name, title, modification_time, cve_refs, max_cvss FROM scap.cpes LIMIT ? OFFSET ?", limit, offset).Rows()
 	if err != nil {
 		log.Fatal(err)
@@ -802,12 +1060,11 @@ func allCpes(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var count int
-	row := db.Raw("Select count(*) from scap.cpes").Row() // (*sql.Row)
+	row := db.Raw("SELECT count(*) FROM scap.cpes").Row() // (*sql.Row)
 	row.Scan(&count)
 	paginator := Paging(page, limit, offset, count, &cpes)
 	json.NewEncoder(w).Encode(paginator)
 }
-
 func getCpe(w http.ResponseWriter, r *http.Request) {
 	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
 	// if err != nil {
@@ -879,7 +1136,7 @@ func allHosts(w http.ResponseWriter, r *http.Request) {
 	page, err := strconv.Atoi(vars["page"])
 
 	var offset int
-	limit := 10
+	limit := 5
 	if page == 1 {
 		offset = 0
 	} else {
@@ -1132,6 +1389,25 @@ func allUser(w http.ResponseWriter, r *http.Request) {
 	paginator := Paging(page, limit, offset, count, &users)
 	json.NewEncoder(w).Encode(paginator)
 }
+
+func getRoles(w http.ResponseWriter, r *http.Request) {
+	rows, err := db.Raw("SELECT id, name FROM roles").Rows()
+	if err != nil {
+		log.Fatal(err)
+	}
+	var roles []Roles
+	for rows.Next() {
+		var role Roles
+		err = rows.Scan(&role.Id, &role.Name)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		roles = append(roles, role)
+	}
+	json.NewEncoder(w).Encode(roles)
+}
+
 func createUser(w http.ResponseWriter, r *http.Request) {
 	// db, err := gorm.Open("postgres", "user=postgres dbname=mydb password=19121997 sslmode=disable")
 	// if err != nil {
@@ -1159,31 +1435,44 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		// password, err := bcrypt.GenerateFromPassword([]byte(user.Password), 8)
 		// pass := string(password)
 		Host_allow, err := strconv.Atoi(user.Host_allow)
-		if err == nil {
+		if err != nil {
 			fmt.Println("Error")
 		}
 		Iface_allow, err := strconv.Atoi(user.Iface_allow)
-		if err == nil {
+		if err != nil {
 			fmt.Println("Error")
 		}
-
 		role, err := strconv.Atoi(user.Role)
-		if err == nil {
+		if err != nil {
 			fmt.Println("Error")
 		}
-		db.Exec("INSERT INTO users(uuid, name, comment, password, hosts, hosts_allow, ifaces, ifaces_allow, creation_time, modification_time) VALUES (?,?,?,?,?,?,?,?,?,?)", &u, &user.Name, &user.Comment, &user.Password, &user.Hosts, &Host_allow, &user.Ifaces, &Iface_allow, &created, &modified)
-		db.Exec("INSERT INTO role_users(role, user) VALUES(?,SELECT id FROM users WHERE name = ?)", &role, &user.Name)
+		// db.Exec("INSERT INTO users(uuid, name, comment, password, hosts, hosts_allow, ifaces, ifaces_allow, creation_time, modification_time) VALUES (?,?,?,?,?,?,?,?,?,?)", &u, &user.Name, &user.Comment, &user.Password, &user.Hosts, &Host_allow, &user.Ifaces, &Iface_allow, &created, &modified)
+		// db.Exec("INSERT INTO role_users(role, user) VALUES(?,SELECT id FROM users WHERE name = ?)", &role, &user.Name)
+		db.Exec("with userr as (insert into users(uuid, name, comment, password, hosts, hosts_allow, ifaces, ifaces_allow, creation_time, modification_time) values (?,?,?,?,?,?,?,?,?,?) returning id) insert into role_users(role, \"user\") values ( ?, (select id from userr))", &u, &user.Name, &user.Comment, &user.Password, &user.Hosts, &Host_allow, &user.Ifaces, &Iface_allow, &created, &modified, &role)
 	}
 
 }
 
 func updateUser(w http.ResponseWriter, r *http.Request) {
-	// vars := mux.Vars(r)
-	// id := vars["id"]
+	vars := mux.Vars(r)
+	userId := vars["id"]
 
 	var user User
 	_ = json.NewDecoder(r.Body).Decode(&user)
-
+	var modified = time.Now().Unix()
+	Host_allow, err := strconv.Atoi(user.Host_allow)
+	if err != nil {
+		fmt.Println("Error")
+	}
+	Iface_allow, err := strconv.Atoi(user.Iface_allow)
+	if err != nil {
+		fmt.Println("Error")
+	}
+	role, err := strconv.Atoi(user.Role)
+	if err != nil {
+		fmt.Println("Error")
+	}
+	db.Exec("with userr as (update users set name= ?, comment = ?, password = ?, hosts = ?, hosts_allow = ?, ifaces = ?, ifaces_allow = ?, modification_time = ? where id = ? returning id) update role_users set role = ? from userr where \"user\" = userr.id", &user.Name, &user.Comment, &user.Password, &user.Hosts, &Host_allow, &user.Ifaces, &Iface_allow, &modified, &userId, &role)
 	fmt.Fprintf(w, "Successfully Updated User")
 
 }
@@ -1193,8 +1482,10 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 
 	// db.Exec("DELETE FROM role_users WHERE user = ?", &userId)
 	// db.Exec("DELETE FROM users WHERE id = ?", &userId)
-	db.Exec("DELETE ur FROM dbo.UserRoles ur INNER JOIN dbo.Roles r ON r.RoleId = ur.Role INNER JOIN dbo.Users u ON ur.user = u.id WHERE u.id = ?", &userId)
-
+	// db.Exec("DELETE ur FROM dbo.UserRoles ur INNER JOIN dbo.Roles r ON r.RoleId = ur.Role INNER JOIN dbo.Users u ON ur.user = u.id WHERE u.id = ?", &userId)
+	// db.Exec("INSERT INTO role_users_trash(role, \"user\") SELECT role, \"user\" FROM role_users WHERE \"user\" = ?", &userId)
+	db.Exec("DELETE FROM role_users WHERE \"user\" = ?", &userId)
+	db.Exec("DELETE FROM users WHERE id = ?", &userId)
 }
 
 // func handleRequests() {
@@ -1220,12 +1511,17 @@ func main() {
 	myRouter := mux.NewRouter()
 	myRouter.HandleFunc("/login", login).Methods("POST")
 	myRouter.HandleFunc("/dashboard", getDashboard).Methods("GET")
+	myRouter.HandleFunc("/cvebyseverity", cveBySeverity).Methods("GET")
+	myRouter.HandleFunc("/nvtbyseverity", nvtBySeverity).Methods("GET")
 	myRouter.HandleFunc("/users/page/{page}", allUser).Methods("GET")
+	myRouter.HandleFunc("/roles", getRoles).Methods("GET")
 	myRouter.HandleFunc("/user/{id}", deleteUser).Methods("DELETE")
 	myRouter.HandleFunc("/user/{id}", updateUser).Methods("PUT")
 	myRouter.HandleFunc("/user", createUser).Methods("POST")
 	myRouter.HandleFunc("/targets/page/{page}", allTargets).Methods("GET")
 	myRouter.HandleFunc("/tasks/page/{page}", allTasks).Methods("GET")
+	myRouter.HandleFunc("/reports/{uuid}/page/{page}", reportByTask).Methods("GET")
+	myRouter.HandleFunc("/report/{uuid}/page/{page}", getReport).Methods("GET")
 	myRouter.HandleFunc("/target/{id}", getTarget).Methods("GET")
 	myRouter.HandleFunc("/target", createTarget).Methods("POST")
 	myRouter.HandleFunc("/target/{id}", updateTarget).Methods("PUT")
@@ -1234,6 +1530,7 @@ func main() {
 	myRouter.HandleFunc("/nvt/{id}", getNvt).Methods("GET")
 	myRouter.HandleFunc("/cves/page/{page}", allCves).Methods("GET")
 	myRouter.HandleFunc("/cve/{name}", getCve).Methods("GET")
+	myRouter.HandleFunc("/cpes/page/{page}/search/{search}", searchCpes).Methods("GET")
 	myRouter.HandleFunc("/cpes/page/{page}", allCpes).Methods("GET")
 	myRouter.HandleFunc("/cpe/{id}", getCpe).Methods("GET")
 	myRouter.HandleFunc("/hosts/page/{page}", allHosts).Methods("GET")

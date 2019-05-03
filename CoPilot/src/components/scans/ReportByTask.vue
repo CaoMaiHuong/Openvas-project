@@ -3,14 +3,6 @@
     <div class="row">
       <div class="col-md-12">
         <div class="box">
-          <div class="box-header">
-            <!-- <router-link to="/createtarget"><i class="fa fa-user-plus" style="margin-right: 3px"></i> CREATE</router-link> -->
-            <button data-toggle="modal" data-target="#addTask" @click="showModal">{{ $t('action.createMsg') }}</button>
-            <addTask v-show="isModalVisible"
-                          @close="closeModal"
-            />
-          </div>
-          <!-- /.box-header -->
           <div class="box-body">
             <div class="dataTables_wrapper form-inline dt-bootstrap" id="example1_wrapper">
               <div class="row">
@@ -27,21 +19,31 @@
                     <thead>
                       <tr role="row">
                         <!-- <th style="width: 30px" aria-sort="ascending" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Id</th> -->
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('tasks.nameMsg') }}</th>
+                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('tasks.date') }}</th>
                         <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('tasks.status') }}</th>
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('tasks.report') }}</th>
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('tasks.lastReport') }}</th>
+                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Task</th>
+                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('tasks.severity') }}</th>
+                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0" style="background:rgb(216, 0, 0)">High</th>
+                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0" style="background:rgb(255, 165, 0)">Medium</th>
+                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0" style="background:rgb(135, 206, 235)">Low</th>
+                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0" style="background:rgb(221, 221, 221)">Log</th>
+                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0" style="background:rgb(192, 192, 192)">False Pos.</th>
                         <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('action.nameMsg') }}</th>
                         <!-- <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0"></th> -->
                       </tr>
                     </thead>
                     <tbody>
-                      <tr class="odd" role="row" v-for="task in tasks" :key="task.id">
+                      <tr class="odd" role="row" v-for="report in reports" :key="report.id">
                         <!-- <td class="sorting_1">{{user.ID}}</td> -->
-                        <td>{{task.name}}</td>
+                        <td><router-link :to="{ name: 'Báo cáo', params: {id: report.uuid}}">{{report.date}}</router-link></td>
                         <td></td>
-                        <td><router-link :to="{ name: 'Danh sách báo cáo', params: {id: task.uuid}}">{{task.rpnumber.String}}</router-link></td>
-                        <td>{{task.last_report}}</td>
+                        <td>{{report.task}}</td>
+                        <td></td>
+                        <td>{{report.rank.high}}</td>
+                        <td>{{report.rank.medium}}</td>
+                        <td>{{report.rank.low}}</td>
+                        <td>{{report.rank.log}}</td>
+                        <td>{{report.rank.na}}</td>
                         <td class="action-edit">
                           <a style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
                           <a> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
@@ -74,48 +76,30 @@
 <script>
 // import $ from 'jquery'
 import axios from 'axios'
-import addTask from './Create.vue'
 // Require needed datatables modules
 require('datatables.net')
 require('datatables.net-bs')
 
 export default {
   name: 'Tables',
-  components: {
-    addTask
-  },
+  props: ['id'],
   data() {
     return {
-      tasks: [],
+      reports: [],
       pagination: [],
       page: 1,
       isModalVisible: false
     }
   },
   mounted() {
-    this.getTask(this.page)
+    this.getReport(this.page, this.id)
   },
-  // created() {
-  //   axios.get('http://localhost:8081/')
-  //   .then(response => {
-  //     let $this = this
-  //     this.users = response.data.records
-  //     $this.makePagination(response.data)
-  //     this.$nextTick(() => {
-  //       this.DataTable = $('#example1').DataTable(
-  //         // {
-  //         //   'pageLength': 11
-  //         // }
-  //       )
-  //     })
-  //   })
-  // },
   methods: {
-    getTask(page) {
-      axios.get('http://localhost:8081/tasks/page/' + page)
+    getReport(page, id) {
+      axios.get('http://localhost:8081/reports/' + id + '/page/' + page)
       .then(response => {
         let $this = this
-        this.tasks = response.data.records
+        this.reports = response.data.records
         $this.makePagination(response.data)
       })
     },
@@ -143,7 +127,9 @@ export default {
       this.pagination = pagination
     },
     fetchPaginate(page) {
-      this.getTask(page)
+    //   let id = this.id
+    //   let $this = this
+      this.getReport(page, this.id)
     },
     openModal () {
 
@@ -189,12 +175,5 @@ table.dataTable thead .sorting_desc:after {
 }
 .pagination span{
   margin: 0px 10px
-}
-#myModal .form-group{
-    display: flex;
-    align-items: center;
-}
-#myModal label{
-    min-width: 125px;
 }
 </style>

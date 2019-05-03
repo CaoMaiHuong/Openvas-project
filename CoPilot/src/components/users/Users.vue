@@ -4,7 +4,7 @@
       <div class="col-md-12">
         <div class="box">
           <div class="box-header">
-            <div data-toggle="modal" data-target="#myModal" @click="showModal"><i class="fa fa-user-plus" style="margin-right: 3px"></i> CREATE</div>
+            <div data-toggle="modal" data-target="#myModal" @click="showModal"><i class="fa fa-user-plus" style="margin-right: 3px"></i> {{ $t('action.createMsg') }}</div>
             <modal
               v-show="isModalVisible"
             />
@@ -25,11 +25,11 @@
                   <table aria-describedby="example1_info" role="grid" id="example1" class="table table-bordered table-striped dataTable">
                     <thead>
                       <tr role="row">
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Name</th>
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Roles</th>
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Host Access</th>
-                        <th  colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Authentication Type</th>
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Action</th>
+                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('users.nameMsg') }}</th>
+                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('users.roleMsg') }}</th>
+                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('users.hostAccessMsg') }}</th>
+                        <th  colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('users.authMsg') }}</th>
+                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('action.nameMsg') }}</th>
                         <!-- <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0"></th> -->
                       </tr>
                     </thead>
@@ -41,8 +41,8 @@
                         <td>{{user.iface_allow}}</td>
                         <td class="action-edit">
                           <updatemodal v-show="isModalVisible" :userData="modalData" />                    
-                          <a data-toggle="modal" data-target="#updateModal" @click="showUpdateModal(user)" style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>Edit</a>
-                          <a @click="deleteUser(user.id)"> <i class="fa fa-trash" style="margin-right: 5px"></i>Delete</a>
+                          <a data-toggle="modal" data-target="#updateModal" @click="showUpdateModal(user)" style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
+                          <a @click="deleteUser(user.id)"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
                         </td>
                       </tr>
                     </tbody>

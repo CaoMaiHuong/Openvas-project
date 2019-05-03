@@ -4,31 +4,31 @@
         <div class="box"  v-for="dt in detail" :key="dt.id">
           <div class="box-header">
             <div class="cve-list">
-                <h4><router-link :to="{name: 'Cpes'}"><i class="fa fa-list"><span  style="margin-left:5px">CPE List</span></i></router-link></h4>
+                <h4><router-link :to="{name: 'Cpes'}"><i class="fa fa-list"><span  style="margin-left:5px">{{ $t('cpes.cpeListMsg') }}</span></i></router-link></h4>
             </div>
           </div>
           <div class="box-body">
             <div class="cpe-infomation">
               <h3>{{dt.name}}</h3>
                 <span>ID: {{dt.name}}</span><br>
-                <span v-if='dt.title.Valid'>Title: {{dt.title.String}} <br></span>
+                <span v-if='dt.title.Valid'>{{ $t('cpes.titleMsg') }}: {{dt.title.String}} <br></span>
                 <span v-if='dt.nvd_id.Valid'>NVD ID: {{dt.nvd_id.Int64}}<br></span>
-                <span>Created: {{dt.created}}</span> <br>
+                <span>{{ $t('createMsg') }}: {{dt.created}}</span> <br>
                 <span>Last updated: {{dt.modified}}</span><br>
-                <span v-if='dt.status.Valid'>Status: {{dt.status.String}} <br></span>
-                <span>Severity: {{dt.severity.String}}</span>
+                <span v-if='dt.status.Valid'>{{ $t('statusMsg') }}: {{dt.status.String}} <br></span>
+                <span>{{ $t('severityMsg') }}: {{dt.severity.String}}</span>
             </div>
             <div class="cpe">
               
               <div>
-                <h3>Reported vulnerabilites</h3>
+                <h3>{{ $t('cpes.reportVul') }}</h3>
                 <div v-if='dt.reportedVulnerabilites != null'>
                   <div class="col-sm-12 table-responsive">
                     <table aria-describedby="example1_info" role="grid" id="example1" class="table table-bordered table-striped dataTable">
                       <thead>
                         <tr role="row">
-                          <th style="width: 13%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Name</th>
-                          <th style="width: 7%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Severity</th>
+                          <th style="width: 13%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('cpes.nameMsg') }}</th>
+                          <th style="width: 7%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('severityMsg') }}</th>
                         </tr>
                       </thead>
                       <tbody>

@@ -4,21 +4,21 @@
       <div class="box"  v-for="dt in detail" :key="dt.id">
         <div class="box-header">
           <div class="cve-list">
-              <h4><router-link :to="{name: 'Hosts'}"><i class="fa fa-list"><span  style="margin-left:5px">Host List</span></i></router-link></h4>
+              <h4><router-link :to="{name: 'Hosts'}"><i class="fa fa-list"><span  style="margin-left:5px">{{ $t('hosts.hostList') }}</span></i></router-link></h4>
           </div>
         </div>
         <div class="box-body">
           <div class="host-name">
             <h3>Host: {{dt.name}}</h3>
             <span>ID: {{dt.uuid}}</span><br>
-            <span>Created: {{dt.created}}</span> <br>
-            <span>Last updated: {{dt.modified}}</span><br>
+            <span>{{ $t('createMsg') }} {{dt.created}}</span> <br>
+            <span>{{ $t('lastUpdate') }}: {{dt.modified}}</span><br>
           </div>
           <div class="host-infomation">
-            <span> Hostname:  {{dt.hostname.String}}<br></span>
-            <span> IP Address:  {{dt.ipaddress.String}}<br></span>
-            <span> Comment:  {{dt.comment}}<br></span>
-            <span> Severity:  {{dt.severity}}<br></span>
+            <span> {{ $t('hosts.hostnameMsg') }}:  {{dt.hostname.String}}<br></span>
+            <span> {{ $t('hosts.ipMsg') }}:  {{dt.ipaddress.String}}<br></span>
+            <span> {{ $t('commentMsg') }}: {{dt.comment}}<br></span>
+            <span> {{ $t('severityMsg') }}:  {{dt.severity.Float64}}<br></span>
             <div class="latest-identifiers">
               <h3>Latest Identifiers</h3>
               <div v-if='dt.identifier != null'>
@@ -26,9 +26,9 @@
                   <table aria-describedby="example1_info" role="grid" id="example1" class="table table-bordered table-striped dataTable">
                     <thead>
                       <tr role="row">
-                        <th style="width: 15%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Name</th>
+                        <th style="width: 15%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('hosts.nameMsg') }}</th>
                         <th style="width: 30%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Value</th>
-                        <th style="width: 25%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Created</th>
+                        <th style="width: 25%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('createMsg') }}</th>
                         <th style="width: 30%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Source</th>
                       </tr>
                     </thead>
@@ -38,7 +38,7 @@
                         <td>{{i.value}}</td>
                         <td>{{i.created}}</td>
                         <td>
-                          <span>Report &nbsp; &nbsp;{{i.source.report}}</span>
+                          <span>{{ $t('hosts.reportMsg') }} &nbsp; &nbsp;<router-link :to="{ name: 'Báo cáo', params: {id: i.source.report}}">{{i.source.report}}</router-link></span>
                           <span v-if='i.source.nvt !=""'>(NTV  &nbsp; &nbsp;<router-link :to="{ name: 'Nvt Detail', params: {id: i.source.nvt }}">{{i.source.nvt}}</router-link>)</span>
                         </td>
                       </tr>

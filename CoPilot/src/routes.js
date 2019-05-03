@@ -19,6 +19,8 @@ import TargetsView from './components/targets/Targets.vue'
 // import TargetCreateView from './components/targets/Create.vue'
 import TargetDetail from './components/targets/TargetDetail.vue'
 import ScansView from './components/scans/Scans.vue'
+import ReportByTask from './components/scans/ReportByTask.vue'
+import Report from './components/scans/Report.vue'
 import NvtsView from './components/databases/Nvt.vue'
 import NvtDetail from './components/databases/NvtDetail.vue'
 import CvesView from './components/databases/Cve.vue'
@@ -50,8 +52,8 @@ const routes = [
         path: 'dashboard',
         alias: '',
         component: DashboardView,
-        name: 'Dashboard',
-        meta: {description: 'Overview of environment'}
+        name: 'Trang chủ',
+        meta: {description: ''}
       }, {
         path: 'tables',
         component: TablesView,
@@ -61,7 +63,7 @@ const routes = [
         path: 'tasks',
         component: TasksView,
         name: 'Tasks',
-        meta: {description: 'Tasks page in the form of a timeline'}
+        meta: {description: ''}
       }, {
         path: 'setting',
         component: SettingView,
@@ -85,13 +87,13 @@ const routes = [
       }, {
         path: 'users',
         component: UsersView,
-        name: 'Users',
-        meta: {description: 'List of users'}
+        name: 'Người dùng',
+        meta: {description: 'Danh sách người dùng'}
       }, {
         path: 'targets',
         component: TargetsView,
         name: 'Targets',
-        meta: {description: 'List of targets'}
+        meta: {description: 'Danh sách target'}
       }, {
         path: '/target/:id',
         component: TargetDetail,
@@ -104,10 +106,22 @@ const routes = [
         name: 'Scans',
         meta: {description: 'List of scans'}
       }, {
+        path: '/reports/:id',
+        component: ReportByTask,
+        name: 'Danh sách báo cáo',
+        props: true,
+        meta: {description: ''}
+      }, {
+        path: '/report/:id',
+        component: Report,
+        name: 'Báo cáo',
+        props: true,
+        meta: {description: ''}
+      }, {
         path: 'nvts',
         component: NvtsView,
         name: 'Nvts',
-        meta: {description: 'List of nvts'}
+        meta: {description: 'Danh sách NVT'}
       }, {
         path: '/nvt/:id',
         component: NvtDetail,
@@ -118,7 +132,7 @@ const routes = [
         path: 'cves',
         component: CvesView,
         name: 'Cves',
-        meta: {description: 'List of cves'}
+        meta: {description: 'Danh sách CVE'}
       }, {
         path: '/cve/:name',
         component: CveDetail,
@@ -129,7 +143,7 @@ const routes = [
         path: 'cpes',
         component: CpesView,
         name: 'Cpes',
-        meta: {description: 'List of cpes'}
+        meta: {description: 'Danh sách CPE'}
       }, {
         path: '/cpe/:id',
         component: CpeDetail,
@@ -140,7 +154,7 @@ const routes = [
         path: 'hosts',
         component: HostsView,
         name: 'Hosts',
-        meta: {description: 'List of hosts'}
+        meta: {description: 'Danh sách host'}
       }, {
         path: '/host/:id',
         component: HostDetail,

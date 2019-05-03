@@ -3,7 +3,7 @@
     <router-link tag="li" class="pageLink" to="/">
       <a>
         <i class="fa fa-desktop"></i>
-        <span class="page">Dashboard</span>
+        <span class="page">{{ $t('dashboardMsg') }}</span>
       </a>
     </router-link>
     <router-link tag="li" class="pageLink" to="/targets">
@@ -18,16 +18,16 @@
         <span class="page">Scan</span>
       </a>
     </router-link>
-    <router-link tag="li" class="pageLink" to="/vulnerabilities">
+    <!-- <router-link tag="li" class="pageLink" to="/vulnerabilities">
       <a>
         <i class="fa fa-bug"></i>
         <span class="page">Vulnerabilities</span>
       </a>
-    </router-link>
+    </router-link> -->
     <router-link tag="li" class="pageLink" to="/users">
       <a>
         <i class="fa fa-users"></i>
-        <span class="page">User Management</span>
+        <span class="page">{{ $t('usermanaMsg') }}</span>
       </a>
     </router-link>
     <li class="treeview">
