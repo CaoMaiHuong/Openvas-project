@@ -34,7 +34,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="user in users" :key="user.id"> 
+                      <tr v-for="(user, index) in users" :key="user.id"> 
                         <td class="sorting_1">{{user.name}}</td>
                         <td>{{user.role}}</td>
                         <td>{{user.host_allow}}</td>
@@ -42,7 +42,7 @@
                         <td class="action-edit">
                           <updatemodal v-show="isModalVisible" :userData="modalData" />                    
                           <a data-toggle="modal" data-target="#updateModal" @click="showUpdateModal(user)" style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
-                          <a @click="deleteUser(user.id)"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
+                          <a @click="deleteUser(user.id, index)"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
                         </td>
                       </tr>
                     </tbody>
@@ -110,11 +110,11 @@ export default {
       this.isModalVisible = true
       this.modalData = item
     },
-    deleteUser: function(id) {
+    deleteUser: function(id, index) {
       if (confirm('Do you really want to delete it?')) {
         axios.delete('http://localhost:8081/user/' + id)
         .then(response => {
-          location.reload()
+          this.users.splice(index, 1)
         })
       }
     },

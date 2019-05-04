@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="myModal" class="modal fade" role="dialog">
+    <div id="myModal" class="modal fade" role="dialog" v-show='isModalVisible'>
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -20,7 +20,7 @@
                   <label class="control-label" for="comment">Comment</label>
                   <input class="form-control" v-model="comment" name="comment" type="text">
                 </div>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary" >Save</button>
               </form>
           </div>
           <div class="modal-footer">
@@ -38,7 +38,8 @@
     data() {
       return {
         name: '',
-        comment: ''
+        comment: '',
+        isModalVisible: true
       }
     },
     methods: {
@@ -54,11 +55,14 @@
               }
             })
             .then(response => {
-              this.$router.push('/hosts')
+              this.isModalVisible = false
             })
           }
         })
       }
+      // closeModel() {
+      //   this.isModalVisible = false
+      // }
     }
   }
 </script>

@@ -74,12 +74,12 @@ type Dashboard struct {
 }
 
 type BySeverity struct {
-	Total  int `json:"total"`
-	High   int `json:"high"`
-	Medium int `json:"medium"`
-	Low    int `json:"low"`
-	Log    int `json:"log"`
-	NA     int `json:"na"`
+	Total  int           `json:"total"`
+	High   sql.NullInt64 `json:"high"`
+	Medium sql.NullInt64 `json:"medium"`
+	Low    sql.NullInt64 `json:"low"`
+	Log    sql.NullInt64 `json:"log"`
+	NA     sql.NullInt64 `json:"na"`
 }
 
 type Roles struct {
@@ -135,18 +135,69 @@ type Task struct {
 	Status       string         `json:"status"`
 	ReportNumber sql.NullString `json:"rpnumber"`
 	// Reports      string         `json:"report"`
-	LastReport string `json:"last_report"`
-	Severity   string `json:"severity"`
+	LastReport             string `json:"last_report"`
+	Severity               string `json:"severity"`
+	Comment                string `json:"comment"`
+	Target                 string `json:"target"`
+	Alert                  string `json:"alert"`
+	Schedule               string `json:"schedule"`
+	In_assets              string `json:"in_assets"`
+	Assets_apply_overrides string `json:"assets_apply_overrides"`
+	Assets_min_qod         string `json:"assets_min_qod"`
+	Alterable              int    `json:"alterable"`
+	Auto_delete            string `json:"auto_delete"`
+	Auto_delete_data       string `json:"auto_delete_data"`
+	Scanner                int    `json:"scanner"`
+	Config                 int    `json:"config"`
+	Network                string `json:"network"`
+	Hosts_ordering         string `json:"hosts_ordering"`
+	Max_checks             string `json:"max_checks"`
+	Max_hosts              string `json:"max_hosts"`
+}
+
+// type TaskInfo struct {
+// 	Name string `json:"name"`
+// 	Comment string `json:"comment"`
+// 	Target string `json:"target"`
+// 	Alert string `json:"alert"`
+// 	Schedule string `json:"schedule"`
+// 	In_assets string `json:"in_assets"`
+// 	Assets_apply_overrides string  `json:"assets_apply_overrides"`
+// 	Assets_min_qod string `json:"assets_min_qod"`
+// 	Alterable int `json:"alterable"`
+// 	Auto_delete string `json:"auto_delete"`
+// 	Auto_delete_data string `json:"auto_delete_data"`
+// 	Scanner int `json:"scanner"`
+// 	Config int `json:"config"`
+// 	Network string `json:"network"`
+// 	Hosts_ordering string `json:"hosts_ordering"`
+// 	Max_checks string `json:"max_checks"`
+// 	Max_hosts string `json:"max_hosts"`
+// }
+
+type Task_Targert struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type Scanner struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type Config struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 type Report struct {
-	Id       int        `json:"id"`
-	Uuid     string     `json:"uuid"`
-	Status   string     `json:"status"`
-	Date     string     `json:"date"`
-	Task     string     `json:"task"`
-	Severity string     `json:"severity"`
-	Rank     BySeverity `json:"rank"`
+	Id       int            `json:"id"`
+	Uuid     string         `json:"uuid"`
+	Status   string         `json:"status"`
+	Date     string         `json:"date"`
+	Task     string         `json:"task"`
+	Severity sql.NullString `json:"severity"`
+	Rank     BySeverity     `json:"rank"`
 }
 type HostResult struct {
 	Ip   string `json:"ip"`
@@ -250,7 +301,7 @@ type Host struct {
 	Comment    string          `json:"comment"`
 	Hostname   sql.NullString  `json:"hostname"`
 	IpAddress  sql.NullString  `json:"ipaddress"`
-	Severity   sql.NullFloat64 `json:"severity"`
+	Severity   sql.NullString `json:"severity"`
 	Modified   string          `json:"modified"`
 	Identifier []Identifiers   `json:"identifier"`
 }
@@ -539,6 +590,66 @@ func allPortList(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(portLists)
 }
 
+func allTaskTarget(w http.ResponseWriter, r *http.Request) {
+	var targets []Target_Task
+	rows, err := db.Raw("SELECT id, name from targets").Rows()
+	if err != nil {
+		log.Print(err)
+		return
+	}
+
+	for rows.Next() {
+		var target Target_Task
+		err = rows.Scan(&target.Id, &target.Name)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		targets = append(targets, target)
+	}
+	json.NewEncoder(w).Encode(targets)
+}
+
+func allScanner(w http.ResponseWriter, r *http.Request) {
+	var scanners []Scanner
+	rows, err := db.Raw("SELECT id, name from scanners").Rows()
+	if err != nil {
+		log.Print(err)
+		return
+	}
+
+	for rows.Next() {
+		var scanner Scanner
+		err = rows.Scan(&scanner.Id, &scanner.Name)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		scanners = append(scanners, scanner)
+	}
+	json.NewEncoder(w).Encode(scanners)
+}
+
+func allConfig(w http.ResponseWriter, r *http.Request) {
+	var configs []Config
+	rows, err := db.Raw("SELECT id, name from configs").Rows()
+	if err != nil {
+		log.Print(err)
+		return
+	}
+
+	for rows.Next() {
+		var config Config
+		err = rows.Scan(&config.Id, &config.Name)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		configs = append(configs, config)
+	}
+	json.NewEncoder(w).Encode(configs)
+}
+
 func allTasks(w http.ResponseWriter, r *http.Request) {
 	var tasks []Task
 	vars := mux.Vars(r)
@@ -552,7 +663,7 @@ func allTasks(w http.ResponseWriter, r *http.Request) {
 		offset = (page - 1) * limit
 	}
 
-	rows, err := db.Raw("SELECT t.id, t.uuid, t.name, r.count as reports, r.max as date FROM tasks t LEFT JOIN (select task, count(id), max(date) from reports group by task) as r ON t.id = r.task WHERE hidden = 0 LIMIT ? OFFSET ?", limit, offset).Rows()
+	rows, err := db.Raw("SELECT t.id, t.uuid, t.name, t.run_status, t.target, r.count as reports, r.max as date FROM tasks t LEFT JOIN (select task, count(id), max(date) from reports group by task) as r ON t.id = r.task WHERE hidden = 0 LIMIT ? OFFSET ?", limit, offset).Rows()
 	if err != nil {
 		log.Print(err)
 		return
@@ -561,7 +672,7 @@ func allTasks(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var task Task
 		var last sql.NullString
-		err = rows.Scan(&task.Id, &task.Uuid, &task.Name, &task.ReportNumber, &last)
+		err = rows.Scan(&task.Id, &task.Uuid, &task.Name, &task.Status, &task.Target, &task.ReportNumber, &last)
 		if err != nil {
 			log.Print(err)
 			return
@@ -577,6 +688,35 @@ func allTasks(w http.ResponseWriter, r *http.Request) {
 			}
 			task.LastReport = time.Unix(i, 0).Format(time.RFC850)
 		}
+		switch task.Status {
+			case "0":
+				task.Status = "Delete Requested"
+			case "1":
+				task.Status = "Done"
+			case "2":
+				task.Status = "New"
+			case "3":
+				task.Status = "Requested"
+			case "4":
+				task.Status = "Running"
+			case "10":
+				task.Status = "Stop Requested"
+			case "11":
+				task.Status = "Ultimate Delete Requested"
+			case "12":
+				task.Status = "Stopped"
+			case "13":
+				task.Status = "Interrupted"
+			case "14":
+				task.Status = "Ultimate Delete Waiting"
+			case "15":
+				task.Status = "Stop Request Giveup"
+			case "16":
+				task.Status = "Deleted Waiting"
+			case "17":
+				task.Status = "Ultimate Delete Waiting"
+		}
+
 		tasks = append(tasks, task)
 	}
 
@@ -585,6 +725,50 @@ func allTasks(w http.ResponseWriter, r *http.Request) {
 	row.Scan(&count)
 	paginator := Paging(page, limit, offset, count, &tasks)
 	json.NewEncoder(w).Encode(paginator)
+}
+
+func createTask(w http.ResponseWriter, r *http.Request) {
+	var task Task
+	_ = json.NewDecoder(r.Body).Decode(&task)
+	var u = uuid.Must(uuid.NewV4())
+	var created = time.Now().Unix()
+	var modified = time.Now().Unix()
+
+	db.Exec("with task as (insert into tasks(uuid, name, comment, hidden, run_status, config, target, scanner, hosts_ordering, alterable, creation_time, modification_time) values (?,?,?,?,?,?,?,?,?,?,?,?) returning id) insert into task_preferences(task, name, value) values ((select id from task), 'max_checks', ?),((select id from task), 'max_hosts', ?),((select id from task), 'in_assets', ?),((select id from task), 'assets_apply_overrides', ?),((select id from task), 'assets_min_qod', ?),((select id from task), 'auto_delete', ?),((select id from task), 'auto_delete_data', ?)", &u, &task.Name, &task.Comment, 0, 2, &task.Config, &task.Target, &task.Scanner, &task.Hosts_ordering, &task.Alterable, &created, &modified, &task.Max_checks, &task.Max_hosts, &task.In_assets, &task.Assets_apply_overrides, &task.Assets_min_qod, &task.Auto_delete, &task.Auto_delete_data)
+}
+
+func updateTask(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	taskId := vars["id"]
+
+	var task Task
+	_ = json.NewDecoder(r.Body).Decode(&task)
+	var modified = time.Now().Unix()
+	// Host_allow, err := strconv.Atoi(user.Host_allow)
+	// if err != nil {
+	// 	fmt.Println("Error")
+	// }
+	// Iface_allow, err := strconv.Atoi(user.Iface_allow)
+	// if err != nil {
+	// 	fmt.Println("Error")
+	// }
+	// role, err := strconv.Atoi(user.Role)
+	// if err != nil {
+	// 	fmt.Println("Error")
+	// }
+	db.Exec("with t as (update tasks set name=?, comment=?, config=?, target=?, scanner=?, hosts_ordering=?, alterable=?, modification_time=? where id = ? returning id) update task_preferences set value = (case when name = 'max_checks' then ? when name = 'max_hosts' then ? when name = 'in_assets' then ? when name = 'assets_apply_overrides' then ? when name = 'assets_min_qod' then ? when name = 'auto_delete' then ? when name = 'auto_delete_data' then ? end) from t WHERE task = t.id", &task.Name, &task.Comment, &task.Config, &task.Target, &task.Scanner, &task.Hosts_ordering, &task.Alterable, &modified, &taskId, &task.Max_checks, &task.Max_hosts, &task.In_assets, &task.Assets_apply_overrides, &task.Assets_min_qod, &task.Auto_delete, &task.Auto_delete_data)
+	fmt.Fprintf(w, "Successfully Updated Task")
+}
+
+func deleteTask(w http.ResponseWriter, r *http.Request) {
+	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
+	// if err != nil {
+	// 	panic("failed to connect database")
+	// }
+	vars := mux.Vars(r)
+	taskId := vars["id"]
+
+	db.Exec("UPDATE tasks SET hidden = 2 WHERE id = ?", &taskId)
 }
 
 func reportByTask(w http.ResponseWriter, r *http.Request) {
@@ -599,7 +783,7 @@ func reportByTask(w http.ResponseWriter, r *http.Request) {
 	} else {
 		offset = (page - 1) * limit
 	}
-	rows, err := db.Raw("select r.id, r.uuid, r.date, t.name from reports r inner join tasks t on r.task = t.id where t.uuid = ? LIMIT ? OFFSET ?", taskId, limit, offset).Rows()
+	rows, err := db.Raw("select r.id, r.uuid, r.date, r.scan_run_status, t.name from reports r inner join tasks t on r.task = t.id where t.uuid = ? LIMIT ? OFFSET ?", taskId, limit, offset).Rows()
 	if err != nil {
 		log.Print(err)
 		return
@@ -607,30 +791,71 @@ func reportByTask(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		var report Report
-		err = rows.Scan(&report.Id, &report.Uuid, &report.Date, &report.Task)
+		err = rows.Scan(&report.Id, &report.Uuid, &report.Date, &report.Status, &report.Task)
 		if err != nil {
 			log.Print(err)
 			return
 		}
+		switch report.Status {
+		case "0":
+			report.Status = "Delete Requested"
+		case "1":
+			report.Status = "Done"
+		case "2":
+			report.Status = "New"
+		case "3":
+			report.Status = "Requested"
+		case "4":
+			report.Status = "Running"
+		case "10":
+			report.Status = "Stop Requested"
+		case "11":
+			report.Status = "Ultimate Delete Requested"
+		case "12":
+			report.Status = "Stopped"
+		case "13":
+			report.Status = "Interrupted"
+		case "14":
+			report.Status = "Ultimate Delete Waiting"
+		case "15":
+			report.Status = "Stop Request Giveup"
+		case "16":
+			report.Status = "Deleted Waiting"
+		case "17":
+			report.Status = "Ultimate Delete Waiting"
+	}
 		i, err := strconv.ParseInt(report.Date, 10, 64)
 		if err != nil {
 			panic(err)
 		}
 		report.Date = time.Unix(i, 0).Format(time.RFC850)
 
-		rows1, err := db.Raw("SELECT sum(case when severity between 7.0 and 10 then 1 else 0 end) as high, sum(case when severity between 4.0 and 6.9 then 1 else 0 end) as medium, sum(case when severity between 0.1 and 3.9 then 1 else 0 end) as low, sum(case when severity = 0 then 1 else 0 end) as log, sum(case when severity is null then 1 else 0 end) as NA from results where report = ?", report.Id).Rows()
+		rows1, err := db.Raw("SELECT max(severity), sum(case when severity between 7.0 and 10 then 1 else 0 end) as high, sum(case when severity between 4.0 and 6.9 then 1 else 0 end) as medium, sum(case when severity between 0.1 and 3.9 then 1 else 0 end) as low, sum(case when severity = 0 then 1 else 0 end) as log, sum(case when severity is null then 1 else 0 end) as NA from results where report = ?", report.Id).Rows()
 		if err != nil {
 			log.Print(err)
 			return
 		}
 		for rows1.Next() {
 			var rp BySeverity
-			err = rows1.Scan(&rp.High, &rp.Medium, &rp.Low, &rp.Log, &rp.NA)
+			err = rows1.Scan(&report.Severity, &rp.High, &rp.Medium, &rp.Low, &rp.Log, &rp.NA)
 			if err != nil {
 				log.Print(err)
 				return
 			}
 			report.Rank = rp
+			if report.Severity.Valid == true {
+				ser, err := strconv.ParseFloat(report.Severity.String, 64)
+				if err != nil {
+					log.Print(err)
+					return
+				}
+				if ser < 0 {
+					report.Severity.String = "Error"
+				}
+			}
+			if report.Severity.Valid == false {
+				report.Severity.String = "N/A"
+			}
 		}
 
 		reports = append(reports, report)
@@ -1474,7 +1699,6 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	db.Exec("with userr as (update users set name= ?, comment = ?, password = ?, hosts = ?, hosts_allow = ?, ifaces = ?, ifaces_allow = ?, modification_time = ? where id = ? returning id) update role_users set role = ? from userr where \"user\" = userr.id", &user.Name, &user.Comment, &user.Password, &user.Hosts, &Host_allow, &user.Ifaces, &Iface_allow, &modified, &userId, &role)
 	fmt.Fprintf(w, "Successfully Updated User")
-
 }
 func deleteUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -1520,6 +1744,12 @@ func main() {
 	myRouter.HandleFunc("/user", createUser).Methods("POST")
 	myRouter.HandleFunc("/targets/page/{page}", allTargets).Methods("GET")
 	myRouter.HandleFunc("/tasks/page/{page}", allTasks).Methods("GET")
+	myRouter.HandleFunc("/task", createTask).Methods("POST")
+	myRouter.HandleFunc("/task/{id}", updateTask).Methods("PUT")
+	myRouter.HandleFunc("/task/{id}", deleteTask).Methods("DELETE")
+	myRouter.HandleFunc("/task_target", allTaskTarget).Methods("GET")
+	myRouter.HandleFunc("/scanners", allScanner).Methods("GET")
+	myRouter.HandleFunc("/configs", allConfig).Methods("GET")
 	myRouter.HandleFunc("/reports/{uuid}/page/{page}", reportByTask).Methods("GET")
 	myRouter.HandleFunc("/report/{uuid}/page/{page}", getReport).Methods("GET")
 	myRouter.HandleFunc("/target/{id}", getTarget).Methods("GET")

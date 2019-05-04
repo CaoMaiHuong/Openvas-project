@@ -23,18 +23,18 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr class="odd" role="row" v-for="host in hosts" :key="host.id">
+                      <tr class="odd" role="row" v-for="(host, index) in hosts" :key="host.id">
                         <td class="sorting_1">
                           <router-link :to="{ name: 'Host Detail', params: {id: host.uuid }}">{{host.name}}</router-link>
                         </td>
                         <td>{{host.hostname.String}}</td>
                         <td>{{host.ipaddress.String}}</td>
-                        <td>{{host.severity.Float64}}</td>
+                        <td>{{host.severity.String}}</td>
                         <td>{{host.modified}}</td>
                         <td class="action-edit">
                           <updatemodal v-show="isModalVisible" :hostData="modalData" />                    
                           <a data-toggle="modal" data-target="#updateHost" @click="showUpdateModal(host)" style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
-                          <a @click="deleteHost(host.id)"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
+                          <a @click="deleteHost(index, host.id)"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
                         </td>
                       </tr>
                     </tbody>
@@ -103,11 +103,11 @@ export default {
       this.isModalVisible = true
       this.modalData = item
     },
-    deleteHost(id) {
+    deleteHost(index, id) {
       if (confirm('Do you really want to delete it?')) {
         axios.delete('http://localhost:8081/host/' + id)
         .then(response => {
-          location.reload()
+          this.hosts.splice(index, 1)
         })
       }
     },

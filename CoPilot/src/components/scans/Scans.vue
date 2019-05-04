@@ -5,7 +5,7 @@
         <div class="box">
           <div class="box-header">
             <!-- <router-link to="/createtarget"><i class="fa fa-user-plus" style="margin-right: 3px"></i> CREATE</router-link> -->
-            <button data-toggle="modal" data-target="#addTask" @click="showModal">{{ $t('action.createMsg') }}</button>
+            <button data-toggle="modal" data-target="#addTask" @click="showModal" id="btn-modal">{{ $t('action.createMsg') }}</button>
             <addTask v-show="isModalVisible"
                           @close="closeModal"
             />
@@ -31,20 +31,23 @@
                         <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('tasks.status') }}</th>
                         <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('tasks.report') }}</th>
                         <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('tasks.lastReport') }}</th>
+                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('tasks.severity') }}</th>
                         <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('action.nameMsg') }}</th>
                         <!-- <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0"></th> -->
                       </tr>
                     </thead>
                     <tbody>
-                      <tr class="odd" role="row" v-for="task in tasks" :key="task.id">
+                      <tr class="odd" role="row" v-for="(task, index) in tasks" :key="task.id">
                         <!-- <td class="sorting_1">{{user.ID}}</td> -->
                         <td>{{task.name}}</td>
-                        <td></td>
+                        <td>{{task.status}}</td>
                         <td><router-link :to="{ name: 'Danh sách báo cáo', params: {id: task.uuid}}">{{task.rpnumber.String}}</router-link></td>
                         <td>{{task.last_report}}</td>
-                        <td class="action-edit">
-                          <a style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
-                          <a> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
+                        <td></td>
+                        <td>
+                          <updatetask v-show="isModalVisible" :taskData="modalData" />                    
+                          <a data-toggle="modal" data-target="#updateTask" @click="showUpdateModal(task)" style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
+                          <a @click="deleteTask(task.id, index)"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
                         </td>
                       </tr>
                     </tbody>
@@ -75,6 +78,7 @@
 // import $ from 'jquery'
 import axios from 'axios'
 import addTask from './Create.vue'
+import updatetask from './Update.vue'
 // Require needed datatables modules
 require('datatables.net')
 require('datatables.net-bs')
@@ -82,34 +86,21 @@ require('datatables.net-bs')
 export default {
   name: 'Tables',
   components: {
-    addTask
+    addTask,
+    updatetask
   },
   data() {
     return {
       tasks: [],
       pagination: [],
       page: 1,
-      isModalVisible: false
+      isModalVisible: false,
+      modalData: null
     }
   },
   mounted() {
     this.getTask(this.page)
   },
-  // created() {
-  //   axios.get('http://localhost:8081/')
-  //   .then(response => {
-  //     let $this = this
-  //     this.users = response.data.records
-  //     $this.makePagination(response.data)
-  //     this.$nextTick(() => {
-  //       this.DataTable = $('#example1').DataTable(
-  //         // {
-  //         //   'pageLength': 11
-  //         // }
-  //       )
-  //     })
-  //   })
-  // },
   methods: {
     getTask(page) {
       axios.get('http://localhost:8081/tasks/page/' + page)
@@ -122,17 +113,21 @@ export default {
     showModal() {
       this.isModalVisible = true
     },
+    showUpdateModal(item) {
+      this.isModalVisible = true
+      this.modalData = item
+    },
     closeModal() {
       this.isModalVisible = false
     },
-    // deleteTarget: function(id) {
-    //   if (confirm('Do you really want to delete it?')) {
-    //     axios.delete('http://localhost:8081/user/' + id)
-    //     .then(response => {
-    //       location.reload()
-    //     })
-    //   }
-    // },
+    deleteTask(id, index) {
+      if (confirm('Bạn có chắc chắn muốn xóa?')) {
+        axios.delete('http://localhost:8081/task/' + id)
+        .then(response => {
+          this.tasks.splice(index, 1)
+        })
+      }
+    },
     makePagination(data) {
       let pagination = {
         page: data.page,
@@ -153,14 +148,6 @@ export default {
 </script>
 
 <style>
-/* Using the bootstrap style, but overriding the font to not draw in
-   the Glyphicons Halflings font as an additional requirement for sorting icons.
-
-   An alternative to the solution active below is to use the jquery style
-   which uses images, but the color on the images does not match adminlte.
-
-@import url('/static/js/plugins/datatables/jquery.dataTables.min.css');
-*/
 
 @import url('/static/js/plugins/datatables/dataTables.bootstrap.css');
 

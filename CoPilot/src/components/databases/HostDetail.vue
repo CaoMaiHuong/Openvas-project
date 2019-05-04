@@ -18,7 +18,7 @@
             <span> {{ $t('hosts.hostnameMsg') }}:  {{dt.hostname.String}}<br></span>
             <span> {{ $t('hosts.ipMsg') }}:  {{dt.ipaddress.String}}<br></span>
             <span> {{ $t('commentMsg') }}: {{dt.comment}}<br></span>
-            <span> {{ $t('severityMsg') }}:  {{dt.severity.Float64}}<br></span>
+            <span> {{ $t('severityMsg') }}:  {{dt.severity.String}}<br></span>
             <div class="latest-identifiers">
               <h3>Latest Identifiers</h3>
               <div v-if='dt.identifier != null'>

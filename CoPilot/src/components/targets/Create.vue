@@ -13,7 +13,7 @@
               <form v-on:submit.prevent="createTarget" class="create-user" style="padding: 0px">
                 <div class="form-group">
                   <label class="control-label" for="name">{{ $t('targets.nameMsg') }}</label>
-                  <input class="form-control" v-model="name" name="name" v-validate="'required'" type="text">
+                  <input class="form-control modal-input" v-model="name" name="name" v-validate="'required'" type="text">
                   <span v-if="errors.has('name')" style="display: block">{{ errors.first('name') }}</span>
                 </div>
                 
@@ -66,6 +66,7 @@
 </template>
 <script>
   import axios from 'axios'
+  // import $ from 'jquery'
   export default {
     name: 'Tables',
     data() {

@@ -127,7 +127,7 @@ export default {
           data: {
             labels: ['High', 'Medium', 'Low', 'Log', 'N/A'],
             datasets: [{
-              data: [response.data.high, response.data.medium, response.data.low, response.data.log, response.data.na],
+              data: [response.data.high.Int64, response.data.medium.Int64, response.data.low.Int64, response.data.log.Int64, response.data.na.Int64],
               backgroundColor: ['rgb(216, 0, 0)', 'rgb(255, 165, 0)', 'rgb(135, 206, 235)', 'rgb(221, 221, 221)', 'rgb(192, 192, 192)'],
               hoverBackgroundColor: ['rgb(216, 0, 0)', 'rgb(255, 165, 0)', 'rgb(135, 206, 235)', 'rgb(221, 221, 221)', 'rgb(192, 192, 192)']
             }]
@@ -209,7 +209,7 @@ export default {
           data: {
             labels: ['High', 'Medium', 'Low', 'Log', 'N/A'],
             datasets: [{
-              data: [response.data.high, response.data.medium, response.data.low, response.data.log, response.data.na],
+              data: [response.data.high.Int64, response.data.medium.Int64, response.data.low.Int64, response.data.log.Int64, response.data.na.Int64],
               backgroundColor: ['rgb(216, 0, 0)', 'rgb(255, 165, 0)', 'rgb(135, 206, 235)', 'rgb(221, 221, 221)', 'rgb(192, 192, 192)'],
               hoverBackgroundColor: ['rgb(216, 0, 0)', 'rgb(255, 165, 0)', 'rgb(135, 206, 235)', 'rgb(221, 221, 221)', 'rgb(192, 192, 192)']
             }]

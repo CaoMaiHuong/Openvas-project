@@ -1,5 +1,6 @@
 <template>
-    <div id="addTask" class="modal fade" role="dialog">
+  <div>
+    <div id="updateTask" class="modal fade" role="dialog">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -9,7 +10,7 @@
             <button type="button" class="close" data-dismiss="modal">&times;</button>  
           </div>
           <div class="modal-body">   
-              <form v-on:submit.prevent="createTask" class="create-user" style="padding: 0px">
+              <form v-on:submit.prevent="updateTask(taskData.id)" class="update-task" style="padding: 0px">
                 <div class="form-group">
                   <label class="control-label" for="name">{{ $t('tasks.nameMsg') }}</label>
                   <input class="form-control" v-model="name" name="name" v-validate="'required'" type="text">
@@ -96,7 +97,7 @@
                   <label class="control-label" for='max_hosts'>{{ $t('tasks.maxScanned') }}</label>
                   <input type="number" v-model="max_hosts" name="max_hosts"><br>
                 </div>
-                <button type="submit" class="btn btn-primary" >Lưu</button>
+                <button type="submit" class="btn btn-primary">Lưu</button>
               </form>
           </div>
           <div class="modal-footer">
@@ -105,13 +106,15 @@
         </div>
       </div>
     </div>
+  </div>
 </template>
 <script>
   import axios from 'axios'
 
   export default {
-    name: 'CreateTask',
-    data(router) {
+    name: 'UpdateTask',
+    props: ['taskData'],
+    data() {
       return {
         targets: [],
         scanners: [],
@@ -163,12 +166,12 @@
           this.configs = response.data
         })
       },
-      createTask() {
+      updateTask(id) {
         this.$validator.validateAll().then(res => {
           if (res) {
             axios({
-              method: 'post',
-              url: 'http://localhost:8081/task',
+              method: 'put',
+              url: 'http://localhost:8081/task/' + id,
               data: {
                 name: this.name,
                 comment: this.comment,
@@ -200,15 +203,23 @@
   }
 </script>
 <style>
-  #addTask {
-    display: flex;
-    align-items: center;
-  }
-  #addTask .modal-body {
+/* #updateTask .form-control{
+  display: unset;
+  width: 100%;
+} */
+/* #updateTask .form-group{
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+} */
+/* #updateTask label {
+  min-width: 125px;
+} */
+    /* #updateTask .modal-body {
     height: 400px;
     overflow: overlay;
     padding: 15px 30px;
-  }
+    } */
   .result, .apply-override, .alterable-task {
     display: flex;
   }

@@ -5,12 +5,12 @@
         <div class="modal-content">
           <div class="modal-header">
             <span class="modal-header__title">
-              Update Target
+              Tạo mới Target
             </span>
             <button type="button" class="close" data-dismiss="modal">&times;</button>  
           </div>
           <div class="modal-body">   
-              <form v-on:submit.prevent="updateTarget" class="update-target" style="padding: 0px">
+              <form v-on:submit.prevent="updateTarget(targetData.id)" class="update-target" style="padding: 0px">
                 <div class="form-group">
                   <label class="control-label" for="name">Name</label>
                   <input class="form-control" v-model="name" name="name" v-validate="'required'" placeholder="Enter ..." type="text">
@@ -58,7 +58,7 @@
                 <button type="submit" class="btn btn-primary">Save</button>
               </form>
           </div>
-          <div>{{targetData.id}}</div>
+          <!-- <div>{{targetData.id}}</div> -->
           <div class="modal-footer">
               
           </div>
@@ -82,7 +82,7 @@
     data() {
       return {
         port: [],
-        name: this.targetData.length,
+        name: '',
         comment: '',
         hosts: '',
         portlist: '',
@@ -104,7 +104,7 @@
       updateTarget(id) {
         axios({
           method: 'put',
-          url: 'http://localhost:8081/target/' + this.targetData.id,
+          url: 'http://localhost:8081/target/' + id,
           data: {
             name: this.name,
             comment: this.comment,

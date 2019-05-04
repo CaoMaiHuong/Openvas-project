@@ -36,7 +36,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr class="odd" role="row" v-for="target in targets" :key="target.id">
+                      <tr class="odd" role="row" v-for="(target, index) in targets" :key="target.id">
                         <!-- <td class="sorting_1">{{user.ID}}</td> -->
                         <td>
                           <router-link :to="{ name: 'Target Detail', params: {id: target.uuid }}">{{target.name}}</router-link>
@@ -46,7 +46,7 @@
                         <td class="action-edit">  
                           <updatemodal v-show="isModalVisible" @close="closeModal" :targetData="modalData" />                    
                           <a data-toggle="modal" data-target="#updateTarget" @click="showUpdateModal(target)" style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
-                          <a @click="deleteTarget(target.id)"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
+                          <a @click="deleteTarget(target.id, index)"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
                         </td>
                       </tr>
                     </tbody>
@@ -123,14 +123,14 @@ export default {
     createUser() {
       this.$router.push('/targets')
     },
-    deleteTarget(id) {
+    deleteTarget(id, index) {
       if (confirm('Bạn có chắc chắn muốn xóa?')) {
         axios({
           method: 'delete',
           url: 'http://localhost:8081/target/' + id
         })
         .then(response => {
-          location.reload()
+          this.targets.splice(index, 1)
         })
       }
     },

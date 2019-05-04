@@ -36,14 +36,14 @@
                       <tr class="odd" role="row" v-for="report in reports" :key="report.id">
                         <!-- <td class="sorting_1">{{user.ID}}</td> -->
                         <td><router-link :to="{ name: 'Báo cáo', params: {id: report.uuid}}">{{report.date}}</router-link></td>
-                        <td></td>
+                        <td>{{report.status}}</td>
                         <td>{{report.task}}</td>
-                        <td></td>
-                        <td>{{report.rank.high}}</td>
-                        <td>{{report.rank.medium}}</td>
-                        <td>{{report.rank.low}}</td>
-                        <td>{{report.rank.log}}</td>
-                        <td>{{report.rank.na}}</td>
+                        <td>{{report.severity.String}}</td>
+                        <td>{{report.rank.high.Int64}}</td>
+                        <td>{{report.rank.medium.Int64}}</td>
+                        <td>{{report.rank.low.Int64}}</td>
+                        <td>{{report.rank.log.Int64}}</td>
+                        <td>{{report.rank.na.Int64}}</td>
                         <td class="action-edit">
                           <a style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
                           <a> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
