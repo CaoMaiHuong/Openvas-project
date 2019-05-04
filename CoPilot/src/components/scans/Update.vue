@@ -10,95 +10,96 @@
             <button type="button" class="close" data-dismiss="modal">&times;</button>  
           </div>
           <div class="modal-body">   
-              <form v-on:submit.prevent="updateTask(taskData.id)" class="update-task" style="padding: 0px">
-                <div class="form-group">
-                  <label class="control-label" for="name">{{ $t('tasks.nameMsg') }}</label>
-                  <input class="form-control" v-model="name" name="name" v-validate="'required'" type="text">
-                  <span v-if="errors.has('name')">{{ errors.first('name') }}</span>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for="comment">{{ $t('commentMsg') }}</label>
-                  <input v-model='comment' class="form-control" name='comment'>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for='target'>{{ $t('tasks.scanTarget') }}</label>
-                  <select onfocus='this.size=10;' onblur='this.size=1;' onchange='this.size=1; this.blur();' class="form-control" v-model="target">
-                    <option class= "choose-target" v-for="t in targets" :key="t.id" v-bind:value="t.id">{{t.name}}</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for="alert">{{ $t('tasks.alert') }}</label>
-                  <select class="form-control" v-model="alert">
-                    <option value>Please select one</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for='schedule'>{{ $t('tasks.schedule') }}</label>
-                  <select class="form-control" v-model="schedule">
-                    <option value>Scan Config Default</option>
-                    <option>ICMP Ping</option>
-                    <option>ARP Ping</option>
-                  </select>
-                </div>
-                <div class="form-group result">
-                  <label class="control-label" for='in_assets'>{{ $t('tasks.addResult') }}</label>
-                  <input type="radio" name="in_assets" v-model="in_assets" value="yes">Có<br>
-                  <input type="radio" name="in_assets" v-model="in_assets" value="no">Không<br>
-                </div>
-                <div class="form-group apply-override">
-                  <label class="control-label" for='assets_apply_overrides'>{{ $t('tasks.apply') }}</label>
-                  <input type="radio" name="assets_apply_overrides" v-model="assets_apply_overrides" value="yes">Có<br>
-                  <input type="radio" name="assets_apply_overrides" v-model="assets_apply_overrides" value="no">Không<br>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for='assets_min_qod'>{{ $t('tasks.minQod') }}</label>
-                  <input type="number" name="assets_min_qod" v-model="assets_min_qod"><br>
-                </div>
-                <div class="form-group alterable-task">
-                  <label class="control-label" for='alterable'>{{ $t('tasks.alterableTask') }}</label>
-                  <input type="radio" name="alterable" v-model="alterable" value="1">Có<br>
-                  <input type="radio" name="alterable" v-model="alterable" value="0">Không<br>
-                </div>
-                <div class="form-group auto-delete">
-                  <label class="control-label" for='auto_delete'>{{ $t('tasks.delReport.name') }}</label><br>
-                  <input type="radio" onclick="document.getElementById('del_data').disabled = true;" name="auto_delete" v-model="auto_delete" value="no" >{{ $t('tasks.delReport.delReport1') }}<br>
-                  <input type="radio" onclick="document.getElementById('del_data').disabled = false;" name="auto_delete" v-model="auto_delete" value="keep">{{ $t('tasks.delReport.delReport2') }}&nbsp;
-                  <input type="number" id="del_data" v-model="auto_delete_data" disabled>&nbsp;báo cáo mới nhất<br>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for='scanner'>{{ $t('tasks.scanner') }}</label>
-                  <select class="form-control" v-model="scanner">
-                    <option v-for="s in scanners" :key="s.id" v-bind:value=s.id>{{s.name}}</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for='config'>{{ $t('tasks.scanConfig') }}</label>
-                  <select class="form-control" v-model="config">
-                    <option v-for="c in configs" :key="c.id" v-bind:value=c.id>{{c.name}}</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for='network'>{{ $t('tasks.networkInterface') }}</label>
-                  <input type="text" v-model="network" name="network"><br>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for='hosts_ordering'>{{ $t('tasks.orderTarget') }}</label>
-                  <select class="form-control" v-model="hosts_ordering">
-                    <option value="sequential">Sequential</option>
-                    <option value="random">Random</option>
-                    <option value="reverse">Reverse</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for='max_checks'>{{ $t('tasks.maxExecutedNvt') }}</label>
-                  <input type="number" v-model="max_checks" name="max_checks"><br>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for='max_hosts'>{{ $t('tasks.maxScanned') }}</label>
-                  <input type="number" v-model="max_hosts" name="max_hosts"><br>
-                </div>
-                <button type="submit" class="btn btn-primary">Lưu</button>
-              </form>
+            <form v-on:submit.prevent="updateTask(taskData.id)" class="update-task" style="padding: 0px">
+              <div class="form-group">
+                <label class="control-label" for="name">{{ $t('tasks.nameMsg') }}</label>
+                <input class="form-control" v-model="name" name="name" v-validate="'required'" type="text">
+                <span v-if="errors.has('name')">{{ errors.first('name') }}</span>
+              </div>
+              <!-- {{taskData}} -->
+              <div class="form-group">
+                <label class="control-label" for="comment">{{ $t('commentMsg') }}</label>
+                <input v-model='comment' class="form-control" name='comment'>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for='target'>{{ $t('tasks.scanTarget') }}</label>
+                <select onfocus='this.size=10;' onblur='this.size=1;' onchange='this.size=1; this.blur();' class="form-control" v-model="target">
+                  <option class= "choose-target" v-for="t in targets" :key="t.id" v-bind:value="t.id">{{t.name}}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for="alert">{{ $t('tasks.alert') }}</label>
+                <select class="form-control" v-model="alert">
+                  <option value>Please select one</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for='schedule'>{{ $t('tasks.schedule') }}</label>
+                <select class="form-control" v-model="schedule">
+                  <option value>Scan Config Default</option>
+                  <option>ICMP Ping</option>
+                  <option>ARP Ping</option>
+                </select>
+              </div>
+              <div class="form-group result">
+                <label class="control-label" for='in_assets'>{{ $t('tasks.addResult') }}</label>
+                <input type="radio" name="in_assets" v-model="in_assets" value="yes">Có<br>
+                <input type="radio" name="in_assets" v-model="in_assets" value="no">Không<br>
+              </div>
+              <div class="form-group apply-override">
+                <label class="control-label" for='assets_apply_overrides'>{{ $t('tasks.apply') }}</label>
+                <input type="radio" name="assets_apply_overrides" v-model="assets_apply_overrides" value="yes">Có<br>
+                <input type="radio" name="assets_apply_overrides" v-model="assets_apply_overrides" value="no">Không<br>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for='assets_min_qod'>{{ $t('tasks.minQod') }}</label>
+                <input type="number" name="assets_min_qod" v-model="assets_min_qod"><br>
+              </div>
+              <div class="form-group alterable-task">
+                <label class="control-label" for='alterable'>{{ $t('tasks.alterableTask') }}</label>
+                <input type="radio" name="alterable" v-model="alterable" value="1">Có<br>
+                <input type="radio" name="alterable" v-model="alterable" value="0">Không<br>
+              </div>
+              <div class="form-group auto-delete">
+                <label class="control-label" for='auto_delete'>{{ $t('tasks.delReport.name') }}</label><br>
+                <input type="radio" onclick="document.getElementById('del_data').disabled = true;" name="auto_delete" v-model="auto_delete" value="no" >{{ $t('tasks.delReport.delReport1') }}<br>
+                <input type="radio" onclick="document.getElementById('del_data').disabled = false;" name="auto_delete" v-model="auto_delete" value="keep">{{ $t('tasks.delReport.delReport2') }}&nbsp;
+                <input type="number" id="del_data" v-model="auto_delete_data" disabled>&nbsp;báo cáo mới nhất<br>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for='scanner'>{{ $t('tasks.scanner') }}</label>
+                <select class="form-control" v-model="scanner">
+                  <option v-for="s in scanners" :key="s.id" v-bind:value=s.id>{{s.name}}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for='config'>{{ $t('tasks.scanConfig') }}</label>
+                <select class="form-control" v-model="config">
+                  <option v-for="c in configs" :key="c.id" v-bind:value=c.id>{{c.name}}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for='network'>{{ $t('tasks.networkInterface') }}</label>
+                <input type="text" v-model="network" name="network"><br>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for='hosts_ordering'>{{ $t('tasks.orderTarget') }}</label>
+                <select class="form-control" v-model="hosts_ordering">
+                  <option value="sequential">Sequential</option>
+                  <option value="random">Random</option>
+                  <option value="reverse">Reverse</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for='max_checks'>{{ $t('tasks.maxExecutedNvt') }}</label>
+                <input type="number" v-model="max_checks" name="max_checks"><br>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for='max_hosts'>{{ $t('tasks.maxScanned') }}</label>
+                <input type="number" v-model="max_hosts" name="max_hosts"><br>
+              </div>
+              <button type="submit" class="btn btn-primary">Lưu</button>
+            </form>
           </div>
           <div class="modal-footer">
               
@@ -114,6 +115,18 @@
   export default {
     name: 'UpdateTask',
     props: ['taskData'],
+//     props: {
+//       taskData: {
+//         type: Array,
+//         default: () => []
+//       }
+//     },
+// //     props: {
+//   arr: {
+//     type: Array,
+//     default: () => ({})
+//   }
+// }
     data() {
       return {
         targets: [],
@@ -154,6 +167,14 @@
           this.targets = response.data
         })
       },
+      // beforeCreated() {
+      //   this.name = this.taskData.name
+      // },
+      // computed: {
+      //   namee() {
+      //     return 'fgdfgfdg'
+      //   }
+      // },
       getScanner() {
         axios.get('http://localhost:8081/scanners')
         .then(response => {
@@ -207,11 +228,11 @@
   display: unset;
   width: 100%;
 } */
-/* #updateTask .form-group{
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-} */
+  /* #updateTask .form-group{
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  } */
 /* #updateTask label {
   min-width: 125px;
 } */
@@ -220,7 +241,7 @@
     overflow: overlay;
     padding: 15px 30px;
     } */
-  .result, .apply-override, .alterable-task {
+  /* .result, .apply-override, .alterable-task {
     display: flex;
   }
   .result label, .apply-override label, .alterable-task label{
@@ -228,5 +249,5 @@
   }
   .result:last-child, .apply-override input:last-child, .alterable-task input:last-child {
     margin-left: 30px;
-  }
+  } */
 </style>

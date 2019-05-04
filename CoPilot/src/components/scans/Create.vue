@@ -200,10 +200,10 @@
   }
 </script>
 <style>
-  #addTask {
+  /* #addTask {
     display: flex;
     align-items: center;
-  }
+  } */
   #addTask .modal-body {
     height: 400px;
     overflow: overlay;

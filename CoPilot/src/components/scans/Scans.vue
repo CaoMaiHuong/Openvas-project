@@ -43,9 +43,9 @@
                         <td>{{task.status}}</td>
                         <td><router-link :to="{ name: 'Danh sách báo cáo', params: {id: task.uuid}}">{{task.rpnumber.String}}</router-link></td>
                         <td>{{task.last_report}}</td>
-                        <td></td>
+                        <td>{{task.severity.String}}</td>
                         <td>
-                          <updatetask v-show="isModalVisible" :taskData="modalData" />                    
+                          <updatetask v-show="isModalVisible" @close="closeModal" :taskData="modalData" />                    
                           <a data-toggle="modal" data-target="#updateTask" @click="showUpdateModal(task)" style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
                           <a @click="deleteTask(task.id, index)"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
                         </td>

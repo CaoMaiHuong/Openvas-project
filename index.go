@@ -136,7 +136,7 @@ type Task struct {
 	ReportNumber sql.NullString `json:"rpnumber"`
 	// Reports      string         `json:"report"`
 	LastReport             string `json:"last_report"`
-	Severity               string `json:"severity"`
+	Severity               sql.NullString `json:"severity"`
 	Comment                string `json:"comment"`
 	Target                 string `json:"target"`
 	Alert                  string `json:"alert"`
@@ -663,7 +663,7 @@ func allTasks(w http.ResponseWriter, r *http.Request) {
 		offset = (page - 1) * limit
 	}
 
-	rows, err := db.Raw("SELECT t.id, t.uuid, t.name, t.run_status, t.target, r.count as reports, r.max as date FROM tasks t LEFT JOIN (select task, count(id), max(date) from reports group by task) as r ON t.id = r.task WHERE hidden = 0 LIMIT ? OFFSET ?", limit, offset).Rows()
+	rows, err := db.Raw("SELECT t.id, t.uuid, t.name, t.run_status, t.target, r.count as reports, r.max as date, re.severity FROM tasks t LEFT JOIN (select task, count(id), max(date) from reports group by task) as r ON t.id = r.task LEFT JOIN (select task, max(severity) as severity from results group by task) as re ON t.id = re.task WHERE hidden = 0 LIMIT ? OFFSET ?", limit, offset).Rows()
 	if err != nil {
 		log.Print(err)
 		return
@@ -672,7 +672,7 @@ func allTasks(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var task Task
 		var last sql.NullString
-		err = rows.Scan(&task.Id, &task.Uuid, &task.Name, &task.Status, &task.Target, &task.ReportNumber, &last)
+		err = rows.Scan(&task.Id, &task.Uuid, &task.Name, &task.Status, &task.Target, &task.ReportNumber, &last, &task.Severity)
 		if err != nil {
 			log.Print(err)
 			return
@@ -744,18 +744,6 @@ func updateTask(w http.ResponseWriter, r *http.Request) {
 	var task Task
 	_ = json.NewDecoder(r.Body).Decode(&task)
 	var modified = time.Now().Unix()
-	// Host_allow, err := strconv.Atoi(user.Host_allow)
-	// if err != nil {
-	// 	fmt.Println("Error")
-	// }
-	// Iface_allow, err := strconv.Atoi(user.Iface_allow)
-	// if err != nil {
-	// 	fmt.Println("Error")
-	// }
-	// role, err := strconv.Atoi(user.Role)
-	// if err != nil {
-	// 	fmt.Println("Error")
-	// }
 	db.Exec("with t as (update tasks set name=?, comment=?, config=?, target=?, scanner=?, hosts_ordering=?, alterable=?, modification_time=? where id = ? returning id) update task_preferences set value = (case when name = 'max_checks' then ? when name = 'max_hosts' then ? when name = 'in_assets' then ? when name = 'assets_apply_overrides' then ? when name = 'assets_min_qod' then ? when name = 'auto_delete' then ? when name = 'auto_delete_data' then ? end) from t WHERE task = t.id", &task.Name, &task.Comment, &task.Config, &task.Target, &task.Scanner, &task.Hosts_ordering, &task.Alterable, &modified, &taskId, &task.Max_checks, &task.Max_hosts, &task.In_assets, &task.Assets_apply_overrides, &task.Assets_min_qod, &task.Auto_delete, &task.Auto_delete_data)
 	fmt.Fprintf(w, "Successfully Updated Task")
 }
