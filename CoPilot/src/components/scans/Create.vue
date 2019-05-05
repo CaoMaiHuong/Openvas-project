@@ -21,9 +21,10 @@
                 </div>
                 <div class="form-group">
                   <label class="control-label" for='target'>{{ $t('tasks.scanTarget') }}</label>
-                  <select onfocus='this.size=10;' onblur='this.size=1;' onchange='this.size=1; this.blur();' class="form-control" v-model="target">
-                    <option class= "choose-target" v-for="t in targets" :key="t.id" v-bind:value="t.id">{{t.name}}</option>
+                  <select onfocus='this.size=10;' onblur='this.size=1;' onchange='this.size=1; this.blur();' name="target" v-validate="'required'" class="form-control"  v-model="target">
+                    <option class= "choose-target" v-for="t in targets" :key="t.id" v-bind:value="t.id" name="target" >{{t.name}}</option>
                   </select>
+                  <span v-if="errors.has('target')">{{ errors.first('target') }}</span>
                 </div>
                 <div class="form-group">
                   <label class="control-label" for="alert">{{ $t('tasks.alert') }}</label>
@@ -42,21 +43,21 @@
                 <div class="form-group result">
                   <label class="control-label" for='in_assets'>{{ $t('tasks.addResult') }}</label>
                   <input type="radio" name="in_assets" v-model="in_assets" value="yes">Có<br>
-                  <input type="radio" name="in_assets" v-model="in_assets" value="no">Không<br>
+                  <input type="radio" name="in_assets" style="margin-left: 30px;" v-model="in_assets" value="no">Không<br>
                 </div>
                 <div class="form-group apply-override">
                   <label class="control-label" for='assets_apply_overrides'>{{ $t('tasks.apply') }}</label>
                   <input type="radio" name="assets_apply_overrides" v-model="assets_apply_overrides" value="yes">Có<br>
-                  <input type="radio" name="assets_apply_overrides" v-model="assets_apply_overrides" value="no">Không<br>
+                  <input type="radio" name="assets_apply_overrides" style="margin-left: 30px;" v-model="assets_apply_overrides" value="no">Không<br>
                 </div>
                 <div class="form-group">
                   <label class="control-label" for='assets_min_qod'>{{ $t('tasks.minQod') }}</label>
-                  <input type="number" name="assets_min_qod" v-model="assets_min_qod"><br>
+                  <input type="number" class="form-control" name="assets_min_qod" v-model="assets_min_qod"><br>
                 </div>
                 <div class="form-group alterable-task">
                   <label class="control-label" for='alterable'>{{ $t('tasks.alterableTask') }}</label>
                   <input type="radio" name="alterable" v-model="alterable" value="1">Có<br>
-                  <input type="radio" name="alterable" v-model="alterable" value="0">Không<br>
+                  <input type="radio" name="alterable" style="margin-left: 30px;" v-model="alterable" value="0">Không<br>
                 </div>
                 <div class="form-group auto-delete">
                   <label class="control-label" for='auto_delete'>{{ $t('tasks.delReport.name') }}</label><br>
@@ -78,7 +79,7 @@
                 </div>
                 <div class="form-group">
                   <label class="control-label" for='network'>{{ $t('tasks.networkInterface') }}</label>
-                  <input type="text" v-model="network" name="network"><br>
+                  <input type="text" class="form-control" v-model="network" name="network"><br>
                 </div>
                 <div class="form-group">
                   <label class="control-label" for='hosts_ordering'>{{ $t('tasks.orderTarget') }}</label>
@@ -90,11 +91,11 @@
                 </div>
                 <div class="form-group">
                   <label class="control-label" for='max_checks'>{{ $t('tasks.maxExecutedNvt') }}</label>
-                  <input type="number" v-model="max_checks" name="max_checks"><br>
+                  <input type="number"  class="form-control" v-model="max_checks" name="max_checks"><br>
                 </div>
                 <div class="form-group">
                   <label class="control-label" for='max_hosts'>{{ $t('tasks.maxScanned') }}</label>
-                  <input type="number" v-model="max_hosts" name="max_hosts"><br>
+                  <input type="number" class="form-control" v-model="max_hosts" name="max_hosts"><br>
                 </div>
                 <button type="submit" class="btn btn-primary" >Lưu</button>
               </form>

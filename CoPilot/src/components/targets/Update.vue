@@ -5,58 +5,58 @@
         <div class="modal-content">
           <div class="modal-header">
             <span class="modal-header__title">
-              Tạo mới Target
+              Sửa đổi Target
             </span>
             <button type="button" class="close" data-dismiss="modal">&times;</button>  
           </div>
           <div class="modal-body">   
-              <form v-on:submit.prevent="updateTarget(targetData.id)" class="update-target" style="padding: 0px">
-                <div class="form-group">
-                  <label class="control-label" for="name">Name</label>
-                  <input class="form-control" v-model="name" name="name" v-validate="'required'" placeholder="Enter ..." type="text">
-                  <!-- <div>{{data.name}}</div> -->
-                  <span v-if="errors.has('name')">{{ errors.first('name') }}</span>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for="comment">Comment</label>
-                  <input v-model='comment' class="form-control" name='comment'>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for='password'>Host</label>
-                  <input v-model='hosts' class="form-control" name='host'>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for="port-list">Port List</label>
-                  <select class="form-control" v-model="portlist">
-                    <option v-for="p in port" :key="p.id" v-bind:value="p.id">{{p.name}}</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for='alivetest'>Alive Test</label>
-                  <select class="form-control" v-model="alivetest">
-                    <option value = "0">Scan Config Default</option>
-                    <option value= "1">TCP-ACK Service Ping</option>
-                    <option value= "2">TCP-SYN Service Ping</option>
-                    <option value="3">ARP Ping</option>
-                    <option value="4">ICMP & TCP-ACK Service Ping</option>
-                    <option value="5"> ICMP & ARP Ping</option>
-                    <option value="6">TCP-ACK Service & ARP Ping</option>
-                    <option value="7">ICMP, TCP-ACK Service & ARP Ping</option>
-                    <option value="8">Consider Alive</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for='rlonly'>Reverse Lookup Only</label>
-                  <input type="radio" name="reverse-only" v-model="rlonly" value=1>Yes<br>
-                  <input type="radio" name="reverse-only" v-model="rlonly" value=0 checked>No<br>
-                </div>
-                <div class="form-group">
-                  <label class="control-label" for='rlunify'>Reverse Lookup Unify</label>
-                  <input type="radio" name="reverse-unify" v-model="rlunify" value=1>Yes<br>
-                  <input type="radio" name="reverse-unify" v-model="rlunify" value=0 checked>No<br>
-                </div>
-                <button type="submit" class="btn btn-primary">Save</button>
-              </form>
+            <form v-on:submit.prevent="updateTarget(targetData.id)" class="update-target" style="padding: 0px">
+              <div class="form-group">
+                <label class="control-label" for="name">{{ $t('targets.nameMsg') }}</label>
+                <input class="form-control" v-model="targetData.name" name="name" v-validate="'required'" type="text">
+                <span v-if="errors.has('name')">{{ errors.first('name') }}</span>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for="comment">{{ $t('commentMsg') }}</label>
+                <input v-model='targetData.comment' class="form-control" name='comment'>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for='host'>{{ $t('targets.hostMsg') }}</label>
+                <input v-model='targetData.hosts' class="form-control" name='host' v-validate="'required'" type="text">
+                <span v-if="errors.has('host')">{{ errors.first('host') }}</span>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for="port-list">{{ $t('targets.portMsg') }}</label>
+                <select class="form-control" v-model="targetData.portlist_id">
+                  <option v-for="p in port" :key="p.id" v-bind:value="p.id">{{p.name}}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for='alivetest'>{{ $t('targets.aliveTestMsg') }}</label>
+                <select class="form-control" v-model="targetData.alivetest">
+                  <option value = "0">Scan Config Default</option>
+                  <option value= "1">TCP-ACK Service Ping</option>
+                  <option value= "2">TCP-SYN Service Ping</option>
+                  <option value="3">ARP Ping</option>
+                  <option value="4">ICMP & TCP-ACK Service Ping</option>
+                  <option value="5"> ICMP & ARP Ping</option>
+                  <option value="6">TCP-ACK Service & ARP Ping</option>
+                  <option value="7">ICMP, TCP-ACK Service & ARP Ping</option>
+                  <option value="8">Consider Alive</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for='rlonly' style="margin-right: 30px;">{{ $t('targets.rlOnlyMsg') }}</label>
+                <input type="radio" name="reverse-only" v-model="targetData.rlonly" value=1>Có<br>
+                <input type="radio" name="reverse-only" v-model="targetData.rlonly" value=0 style="margin-left: 30px;" checked>Không<br>
+              </div>
+              <div class="form-group">
+                <label class="control-label" for='rlunify' style="margin-right: 30px;">{{ $t('targets.rlUnifyMsg') }}</label>
+                <input type="radio" name="reverse-unify" v-model="targetData.rlunify" value=1>Có<br>
+                <input type="radio" name="reverse-unify" v-model="targetData.rlunify" value=0  style="margin-left: 30px;" checked>Không<br>
+              </div>
+              <button type="submit" class="btn btn-primary button-save">Lưu</button>
+            </form>
           </div>
           <!-- <div>{{targetData.id}}</div> -->
           <div class="modal-footer">
@@ -81,14 +81,14 @@
     props: ['targetData'],
     data() {
       return {
-        port: [],
-        name: '',
-        comment: '',
-        hosts: '',
-        portlist: '',
-        alivetest: '',
-        rlonly: '',
-        rlunify: ''
+        port: []
+        // name: '',
+        // comment: '',
+        // hosts: '',
+        // portlist: '',
+        // alivetest: '',
+        // rlonly: '',
+        // rlunify: ''
       }
     },
     mounted() {
@@ -106,13 +106,13 @@
           method: 'put',
           url: 'http://localhost:8081/target/' + id,
           data: {
-            name: this.name,
-            comment: this.comment,
-            hosts: this.hosts,
-            portlist: this.portlist,
-            alivetest: this.alivetest,
-            rlonly: this.rlonly,
-            rlunify: this.rlunify
+            name: this.targetData.name,
+            comment: this.targetData.comment,
+            hosts: this.targetData.hosts,
+            portlist_id: this.targetData.portlist_id,
+            alivetest: this.targetData.alivetest,
+            rlonly: this.targetData.rlonly,
+            rlunify: this.targetData.rlunify
           }
         })
         .then(response => {
@@ -129,6 +129,7 @@
 }
 #updateTarget .form-group{
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   margin-bottom: 15px;
 }
@@ -136,7 +137,7 @@
     min-width: 125px;
 }
 .modal-open .modal {
-    overflow-x: hidden;
+    overflow-x: hidden; 
     overflow-y: hidden;
 }
 </style>

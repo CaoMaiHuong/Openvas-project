@@ -5,22 +5,22 @@
         <div class="modal-content">
           <div class="modal-header">
             <span class="modal-header__title">
-              Update Host
+              Sửa đổi Host
             </span>
             <button type="button" class="close" data-dismiss="modal">&times;</button>  
           </div>
           <div class="modal-body">   
-              <form v-on:submit.prevent="updateHost" class="update-host" style="padding: 0px">
+              <form v-on:submit.prevent="updateHost(hostData.id)" class="update-host" style="padding: 0px">
                 <div class="form-group">
-                  <label class="control-label" for="name">Name</label>
-                  <input class="form-control" v-model="name" name="name" v-validate="'required'" type="text">
+                  <label class="control-label" for="name">{{ $t('hosts.nameMsg') }}</label>
+                  <input class="form-control" v-model="hostData.name" name="name" v-validate="'required'" type="text" disabled>
                   <span v-if="errors.has('name')">{{ errors.first('name') }}</span>
                 </div>
                 <div class="form-group">
-                  <label class="control-label" for="comment">Comment</label>
-                  <input class="form-control" v-model="comment" name="comment" type="text">
+                  <label class="control-label" for="comment">{{ $t('commentMsg') }}</label>
+                  <input class="form-control" v-model="hostData.comment" name="comment" type="text">
                 </div>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary">Lưu</button>
               </form>
           </div>
           <div class="modal-footer">
@@ -38,8 +38,8 @@
     props: ['hostData'],
     data() {
       return {
-        name: '',
-        comment: ''
+        // name: '',
+        // comment: ''
       }
     },
     methods: {
@@ -48,10 +48,10 @@
           if (res) {
             axios({
               method: 'put',
-              url: 'http://localhost:8081/host/' + this.hostData.id,
+              url: 'http://localhost:8081/host/' + id,
               data: {
-                name: this.name,
-                comment: this.comment
+                name: this.hostData.name,
+                comment: this.hostData.comment
               }
             })
             .then(response => {
@@ -64,11 +64,19 @@
   }
 </script>
 <style>
-#myModal .form-group{
+#updateHost .form-group{
     display: flex;
     align-items: center;
+    margin-bottom: 15px;
 }
-#myModal label{
+#updateHost .form-control{
+  width: 100%;
+}
+
+#updateHost label{
     min-width: 125px;
+}
+#updateHost button.btn-primary{
+  margin-top: 20px;
 }
 </style>

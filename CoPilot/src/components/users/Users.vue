@@ -4,7 +4,7 @@
       <div class="col-md-12">
         <div class="box">
           <div class="box-header">
-            <div data-toggle="modal" data-target="#myModal" @click="showModal"><i class="fa fa-user-plus" style="margin-right: 3px"></i> {{ $t('action.createMsg') }}</div>
+            <button data-toggle="modal" class="btn btn-primary" data-target="#createUser" @click="showModal"><i class="fa fa-plus" style="margin-right: 3px"></i> {{ $t('action.createMsg') }}</button>
             <modal
               v-show="isModalVisible"
             />
@@ -42,7 +42,7 @@
                         <td class="action-edit">
                           <updatemodal v-show="isModalVisible" :userData="modalData" />                    
                           <a data-toggle="modal" data-target="#updateModal" @click="showUpdateModal(user)" style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
-                          <a @click="deleteUser(user.id, index)"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
+                          <a @click="deleteUser(user.id, index)" class="action-delete"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
                         </td>
                       </tr>
                     </tbody>
@@ -52,9 +52,11 @@
                     </tfoot>
                   </table>
                   <div class="pagination">
-                    <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.prev_page)" :disabled="pagination.prev_page == pagination.page">Previous</button>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate(1)" :disabled="pagination.page == 1"><i class="fa fa-angle-double-left"></i></button>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.prev_page)" :disabled="pagination.page == 1"><i class="fa fa-angle-left"></i></button>
                     <span>Page {{ pagination.page }} of {{ pagination.total_page }} </span>
-                    <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.next_page)" :disabled="pagination.next_page == pagination.page">Next</button>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.next_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-right"></i></button>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.total_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-double-right"></i></button>
                   </div>
                 </div>
               </div>
@@ -176,5 +178,16 @@ table.dataTable thead .sorting_desc:after {
 }
 .pagination span{
   margin: 0px 10px
+}
+.pagination button {
+  border-radius: 0px;
+  margin: 2px;
+  background: none;
+  border:2px solid blue;
+  color: blue;
+  font-size: 16px;
+  width: 37px;
+  font-weight: bold;
+
 }
 </style>

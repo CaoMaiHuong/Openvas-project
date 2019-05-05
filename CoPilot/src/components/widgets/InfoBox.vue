@@ -1,11 +1,10 @@
 <template>
   <div class="info-box">
     <span :class="['info-box-icon', colorClass]">
-      <i :class="iconClasses"></i>
+      <h1 class="info-box-title">{{title}}</h1>
     </span>
     <div class="info-box-content">
-      <span class="info-box-text">{{text}}</span>
-      <span class="info-box-number">{{number}}</span>
+      <h1 class="info-box-number">{{number}}</h1>
     </div>
   </div>
 </template>
@@ -22,9 +21,9 @@ export default {
       type: String,
       default: ''
     },
-    iconClasses: {
-      type: Array,
-      default: []
+    title: {
+      type: String,
+      default: ''
     },
     colorClass: {
       type: String,

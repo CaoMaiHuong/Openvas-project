@@ -5,7 +5,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <span class="modal-header__title">
-              Tạo mới task
+              Sửa đổi task
             </span>
             <button type="button" class="close" data-dismiss="modal">&times;</button>  
           </div>
@@ -13,17 +13,17 @@
             <form v-on:submit.prevent="updateTask(taskData.id)" class="update-task" style="padding: 0px">
               <div class="form-group">
                 <label class="control-label" for="name">{{ $t('tasks.nameMsg') }}</label>
-                <input class="form-control" v-model="name" name="name" v-validate="'required'" type="text">
+                <input class="form-control" v-model="taskData.name" name="name" v-validate="'required'" type="text">
                 <span v-if="errors.has('name')">{{ errors.first('name') }}</span>
               </div>
               <!-- {{taskData}} -->
               <div class="form-group">
                 <label class="control-label" for="comment">{{ $t('commentMsg') }}</label>
-                <input v-model='comment' class="form-control" name='comment'>
+                <input v-model='taskData.comment' class="form-control" name='comment'>
               </div>
               <div class="form-group">
                 <label class="control-label" for='target'>{{ $t('tasks.scanTarget') }}</label>
-                <select onfocus='this.size=10;' onblur='this.size=1;' onchange='this.size=1; this.blur();' class="form-control" v-model="target">
+                <select onfocus='this.size=10;' onblur='this.size=1;' onchange='this.size=1; this.blur();' class="form-control" v-model="taskData.target">
                   <option class= "choose-target" v-for="t in targets" :key="t.id" v-bind:value="t.id">{{t.name}}</option>
                 </select>
               </div>
@@ -35,7 +35,7 @@
               </div>
               <div class="form-group">
                 <label class="control-label" for='schedule'>{{ $t('tasks.schedule') }}</label>
-                <select class="form-control" v-model="schedule">
+                <select class="form-control" v-model="taskData.schedule.String">
                   <option value>Scan Config Default</option>
                   <option>ICMP Ping</option>
                   <option>ARP Ping</option>
@@ -43,38 +43,38 @@
               </div>
               <div class="form-group result">
                 <label class="control-label" for='in_assets'>{{ $t('tasks.addResult') }}</label>
-                <input type="radio" name="in_assets" v-model="in_assets" value="yes">Có<br>
-                <input type="radio" name="in_assets" v-model="in_assets" value="no">Không<br>
+                <input type="radio" name="in_assets" v-model="taskData.in_assets" value="yes">Có<br>
+                <input type="radio" name="in_assets" v-model="taskData.in_assets" style="margin-left: 30px;" value="no">Không<br>
               </div>
               <div class="form-group apply-override">
                 <label class="control-label" for='assets_apply_overrides'>{{ $t('tasks.apply') }}</label>
-                <input type="radio" name="assets_apply_overrides" v-model="assets_apply_overrides" value="yes">Có<br>
-                <input type="radio" name="assets_apply_overrides" v-model="assets_apply_overrides" value="no">Không<br>
+                <input type="radio" name="assets_apply_overrides" v-model="taskData.assets_apply_overrides" value="yes">Có<br>
+                <input type="radio" name="assets_apply_overrides" v-model="taskData.assets_apply_overrides" style="margin-left: 30px;"  value="no">Không<br>
               </div>
               <div class="form-group">
                 <label class="control-label" for='assets_min_qod'>{{ $t('tasks.minQod') }}</label>
-                <input type="number" name="assets_min_qod" v-model="assets_min_qod"><br>
+                <input type="number" name="assets_min_qod" v-model="taskData.assets_min_qod"><br>
               </div>
               <div class="form-group alterable-task">
                 <label class="control-label" for='alterable'>{{ $t('tasks.alterableTask') }}</label>
-                <input type="radio" name="alterable" v-model="alterable" value="1">Có<br>
-                <input type="radio" name="alterable" v-model="alterable" value="0">Không<br>
+                <input type="radio" name="alterable" v-model="taskData.alterable" value="1">Có<br>
+                <input type="radio" name="alterable" v-model="taskData.alterable" style="margin-left: 30px;" value="0">Không<br>
               </div>
               <div class="form-group auto-delete">
                 <label class="control-label" for='auto_delete'>{{ $t('tasks.delReport.name') }}</label><br>
-                <input type="radio" onclick="document.getElementById('del_data').disabled = true;" name="auto_delete" v-model="auto_delete" value="no" >{{ $t('tasks.delReport.delReport1') }}<br>
-                <input type="radio" onclick="document.getElementById('del_data').disabled = false;" name="auto_delete" v-model="auto_delete" value="keep">{{ $t('tasks.delReport.delReport2') }}&nbsp;
-                <input type="number" id="del_data" v-model="auto_delete_data" disabled>&nbsp;báo cáo mới nhất<br>
+                <input type="radio" onclick="document.getElementById('dele_data').disabled = true;" name="auto_delete" v-model="taskData.auto_delete" value="no" >{{ $t('tasks.delReport.delReport1') }}<br>
+                <input type="radio" onclick="document.getElementById('dele_data').disabled = false;" name="auto_delete" v-model="taskData.auto_delete" value="keep">{{ $t('tasks.delReport.delReport2') }}&nbsp;
+                <input type="number" id="dele_data" v-model="taskData.auto_delete_data" disabled>&nbsp;báo cáo mới nhất<br>
               </div>
               <div class="form-group">
                 <label class="control-label" for='scanner'>{{ $t('tasks.scanner') }}</label>
-                <select class="form-control" v-model="scanner">
+                <select class="form-control" v-model=taskData.scanner>
                   <option v-for="s in scanners" :key="s.id" v-bind:value=s.id>{{s.name}}</option>
                 </select>
               </div>
               <div class="form-group">
                 <label class="control-label" for='config'>{{ $t('tasks.scanConfig') }}</label>
-                <select class="form-control" v-model="config">
+                <select class="form-control" v-model=taskData.config>
                   <option v-for="c in configs" :key="c.id" v-bind:value=c.id>{{c.name}}</option>
                 </select>
               </div>
@@ -84,19 +84,19 @@
               </div>
               <div class="form-group">
                 <label class="control-label" for='hosts_ordering'>{{ $t('tasks.orderTarget') }}</label>
-                <select class="form-control" v-model="hosts_ordering">
+                <select class="form-control" v-model="taskData.hosts_ordering">
                   <option value="sequential">Sequential</option>
                   <option value="random">Random</option>
                   <option value="reverse">Reverse</option>
                 </select>
               </div>
               <div class="form-group">
-                <label class="control-label" for='max_checks'>{{ $t('tasks.maxExecutedNvt') }}</label>
-                <input type="number" v-model="max_checks" name="max_checks"><br>
+                <label class="control-label max_checks" for='max_checks'>{{ $t('tasks.maxExecutedNvt') }}</label>
+                <input type="number" v-model="taskData.max_checks" name="max_checks"><br>
               </div>
               <div class="form-group">
-                <label class="control-label" for='max_hosts'>{{ $t('tasks.maxScanned') }}</label>
-                <input type="number" v-model="max_hosts" name="max_hosts"><br>
+                <label class="control-label max_hosts" for='max_hosts'>{{ $t('tasks.maxScanned') }}</label>
+                <input type="number" v-model="taskData.max_hosts" name="max_hosts"><br>
               </div>
               <button type="submit" class="btn btn-primary">Lưu</button>
             </form>
@@ -131,26 +131,36 @@
       return {
         targets: [],
         scanners: [],
-        configs: [],
-        name: '',
-        comment: '',
-        target: '',
-        alert: '',
-        schedule: '',
-        in_assets: 'yes',
-        assets_apply_overrides: 'yes',
-        assets_min_qod: '70',
-        alterable: '0',
-        auto_delete: 'no',
-        auto_delete_data: '5',
-        scanner: 1,
-        config: 1,
-        network: '',
-        hosts_ordering: 'sequential',
-        max_checks: '4',
-        max_hosts: '20'
+        configs: []
+        // // name: '',
+        // comment: '',
+        // // target: '',
+        // alert: '',
+        // schedule: '',
+        // in_assets: 'yes',
+        // assets_apply_overrides: 'yes',
+        // assets_min_qod: '70',
+        // alterable: '0',
+        // auto_delete: 'no',
+        // auto_delete_data: '5',
+        // scanner: 1,
+        // config: 1,
+        // network: '',
+        // hosts_ordering: 'sequential',
+        // max_checks: '4',
+        // max_hosts: '20'
       }
     },
+    // computed: {
+    //   name: {
+    //     get() {
+    //       return this.task_name
+    //     },
+    //     set(newValue) {
+    //       this.$emit('update:task_name', newValue)
+    //     }
+    //   }
+    // },
     created() {
       this.getTarget()
     },
@@ -194,23 +204,23 @@
               method: 'put',
               url: 'http://localhost:8081/task/' + id,
               data: {
-                name: this.name,
-                comment: this.comment,
-                target: this.target,
-                alert: this.alert,
-                schedule: this.schedule,
-                in_assets: this.in_assets,
-                assets_apply_overrides: this.assets_apply_overrides,
-                assets_min_qod: this.assets_min_qod,
-                alterable: this.alterable,
-                auto_delete: this.auto_delete,
-                auto_delete_data: this.auto_delete_data,
-                scanner: this.scanner,
-                config: this.config,
-                network: this.network,
-                hosts_ordering: this.hosts_ordering,
-                max_checks: this.max_checks,
-                max_hosts: this.max_hosts
+                name: this.taskData.name,
+                comment: this.taskData.comment,
+                target: this.taskData.target,
+                alert: this.taskData.alert,
+                schedule: this.taskData.schedule,
+                in_assets: this.taskData.in_assets,
+                assets_apply_overrides: this.taskData.assets_apply_overrides,
+                assets_min_qod: this.taskData.assets_min_qod,
+                alterable: this.taskData.alterable,
+                auto_delete: this.taskData.auto_delete,
+                auto_delete_data: this.taskData.auto_delete_data,
+                scanner: this.taskData.scanner,
+                config: this.taskData.config,
+                network: this.taskData.network,
+                hosts_ordering: this.taskData.hosts_ordering,
+                max_checks: this.taskData.max_checks,
+                max_hosts: this.taskData.max_hosts
               }
             })
             .then(response => {
@@ -224,30 +234,33 @@
   }
 </script>
 <style>
-/* #updateTask .form-control{
-  display: unset;
-  width: 100%;
-} */
-  /* #updateTask .form-group{
+  #updateTask .form-control{
+    display: unset;
+    width: 100%;
+  } 
+  #updateTask .form-group{
     display: flex;
     align-items: center;
     margin-bottom: 15px;
-  } */
-/* #updateTask label {
-  min-width: 125px;
-} */
-    /* #updateTask .modal-body {
+  }
+  #updateTask label {
+    min-width: 125px;
+  } 
+  #updateTask .modal-body {
     height: 400px;
     overflow: overlay;
     padding: 15px 30px;
-    } */
-  /* .result, .apply-override, .alterable-task {
+    }
+    #updateTask .form-group.auto-delete{
+      display: unset;
+    }
+  .result, .apply-override, .alterable-task {
     display: flex;
   }
-  .result label, .apply-override label, .alterable-task label{
+  .max_checks, .max_hosts, .result label, .apply-override label, .alterable-task label{
     margin-right: 30px;
   }
   .result:last-child, .apply-override input:last-child, .alterable-task input:last-child {
     margin-left: 30px;
-  } */
+  }
 </style>

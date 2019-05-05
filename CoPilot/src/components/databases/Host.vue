@@ -4,7 +4,7 @@
       <div class="col-md-12">
         <div class="box">
           <div class="box-header">
-            <div data-toggle="modal" data-target="#myModal" @click="showModal"><i class="fa fa-user-plus" style="margin-right: 3px"></i>{{ $t('action.createMsg') }}</div>
+            <button data-toggle="modal" class="btn btn-primary" data-target="#myModal" @click="showModal"><i class="fa fa-plus" style="margin-right: 3px"></i> {{ $t('action.createMsg') }}</button>
             <modal v-show="isModalVisible"/>
           </div>
           <div class="box-body">
@@ -34,7 +34,7 @@
                         <td class="action-edit">
                           <updatemodal v-show="isModalVisible" :hostData="modalData" />                    
                           <a data-toggle="modal" data-target="#updateHost" @click="showUpdateModal(host)" style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
-                          <a @click="deleteHost(index, host.id)"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
+                          <a @click="deleteHost(index, host.id)" class="action-delete"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
                         </td>
                       </tr>
                     </tbody>

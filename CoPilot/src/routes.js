@@ -104,7 +104,7 @@ const routes = [
         path: 'scans',
         component: ScansView,
         name: 'Scans',
-        meta: {description: 'List of scans'}
+        meta: {description: 'Danh sách task'}
       }, {
         path: '/reports/:id',
         component: ReportByTask,

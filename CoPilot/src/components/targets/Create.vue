@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="myModal" class="modal fade" role="dialog">
+    <div id="myModal" class="modal fade create-target" role="dialog">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -23,7 +23,8 @@
                 </div>
                 <div class="form-group">
                   <label class="control-label" for='password'>{{ $t('targets.hostMsg') }}</label>
-                  <input v-model='hosts' class="form-control" name='host'>
+                  <input v-model='hosts' class="form-control" name='host' v-validate="'required'" type="text">
+                  <span v-if="errors.has('name')" style="display: block">{{ errors.first('host') }}</span>
                 </div>
                 <div class="form-group">
                   <label class="control-label" for="port-list">{{ $t('targets.portMsg') }}</label>
@@ -55,7 +56,7 @@
                   <input type="radio" name="reverse-unify" v-model="rlunify" value=1>Có<br>
                   <input type="radio" name="reverse-unify" v-model="rlunify" value=0 checked style="margin-left: 30px;">Không<br>
                 </div>
-                <button type="submit" class="btn btn-primary">Lưu</button>
+                <button type="submit" class="btn btn-primary button-save">Lưu</button>
               </form>
           </div>
           
@@ -118,11 +119,27 @@
   }
 </script>
 <style>
-#myModal .form-group{
+/* .create-target{
+  display: flex;
+  align-items: center;
+} */
+.button-save{
+  margin-top: 30px;
+}
+
+.create-target .form-group{
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+}
+.modal .form-group span{
+    color: red;
 }
 #myModal label{
     min-width: 125px;
+}
+.modal-header__title{
+  font-size: 17px;
+  font-weight: 600;
 }
 </style>

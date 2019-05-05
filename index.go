@@ -88,18 +88,21 @@ type Roles struct {
 }
 
 type User struct {
-	Id          int    `json:"id"`
-	Uuid        string `json:"uuid"`
-	Name        string `json:"name"`
-	Comment     string `json:"comment"`
-	Role        string `json:"role"`
-	Password    string `json:"password"`
-	Host_allow  string `json:"host_allow"`
-	Hosts       string `json:"hosts"`
-	Iface_allow string `json:"iface_allow"`
-	Ifaces      string `json:"ifaces"`
-	Created     string `json:"created"`
-	Modified    string `json:"modified"`
+	Id                 int    `json:"id"`
+	Uuid               string `json:"uuid"`
+	Name               string `json:"name"`
+	Comment            string `json:"comment"`
+	Role               string `json:"role"`
+	RoleId             string `json:"role_id"`
+	Password           string `json:"password"`
+	Host_allow         string `json:"host_allow"`
+	Host_allow_number  string `json:"host_allow_number"`
+	Hosts              string `json:"hosts"`
+	Iface_allow        string `json:"iface_allow"`
+	Iface_allow_number string `json:"iface_allow_number"`
+	Ifaces             string `json:"ifaces"`
+	Created            string `json:"created"`
+	Modified           string `json:"modified"`
 }
 
 type Target_Task struct {
@@ -118,6 +121,7 @@ type Target struct {
 	Name          string        `json:"name"`
 	Hosts         string        `json:"hosts"`
 	PortList      string        `json:"portlist"`
+	PortListID      string        `json:"portlist_id"`
 	Comment       string        `json:"comment"`
 	MaxNumberHost string        `json:"maxhost"`
 	RLOnly        string        `json:"rlonly"`
@@ -135,24 +139,24 @@ type Task struct {
 	Status       string         `json:"status"`
 	ReportNumber sql.NullString `json:"rpnumber"`
 	// Reports      string         `json:"report"`
-	LastReport             string `json:"last_report"`
+	LastReport             string         `json:"last_report"`
 	Severity               sql.NullString `json:"severity"`
-	Comment                string `json:"comment"`
-	Target                 string `json:"target"`
-	Alert                  string `json:"alert"`
-	Schedule               string `json:"schedule"`
-	In_assets              string `json:"in_assets"`
-	Assets_apply_overrides string `json:"assets_apply_overrides"`
-	Assets_min_qod         string `json:"assets_min_qod"`
-	Alterable              int    `json:"alterable"`
-	Auto_delete            string `json:"auto_delete"`
-	Auto_delete_data       string `json:"auto_delete_data"`
-	Scanner                int    `json:"scanner"`
-	Config                 int    `json:"config"`
-	Network                string `json:"network"`
-	Hosts_ordering         string `json:"hosts_ordering"`
-	Max_checks             string `json:"max_checks"`
-	Max_hosts              string `json:"max_hosts"`
+	Comment                string         `json:"comment"`
+	Target                 string         `json:"target"`
+	Alert                  string         `json:"alert"`
+	Schedule               sql.NullString `json:"schedule"`
+	In_assets              string         `json:"in_assets"`
+	Assets_apply_overrides string         `json:"assets_apply_overrides"`
+	Assets_min_qod         string         `json:"assets_min_qod"`
+	Alterable              int            `json:"alterable"`
+	Auto_delete            string         `json:"auto_delete"`
+	Auto_delete_data       string         `json:"auto_delete_data"`
+	Scanner                int            `json:"scanner"`
+	Config                 int            `json:"config"`
+	Network                string         `json:"network"`
+	Hosts_ordering         string         `json:"hosts_ordering"`
+	Max_checks             string         `json:"max_checks"`
+	Max_hosts              string         `json:"max_hosts"`
 }
 
 // type TaskInfo struct {
@@ -295,15 +299,15 @@ type Identifiers struct {
 }
 
 type Host struct {
-	Id         int             `json:"id"`
-	Uuid       string          `json:"uuid"`
-	Name       string          `json:"name"`
-	Comment    string          `json:"comment"`
-	Hostname   sql.NullString  `json:"hostname"`
-	IpAddress  sql.NullString  `json:"ipaddress"`
+	Id         int            `json:"id"`
+	Uuid       string         `json:"uuid"`
+	Name       string         `json:"name"`
+	Comment    string         `json:"comment"`
+	Hostname   sql.NullString `json:"hostname"`
+	IpAddress  sql.NullString `json:"ipaddress"`
 	Severity   sql.NullString `json:"severity"`
-	Modified   string          `json:"modified"`
-	Identifier []Identifiers   `json:"identifier"`
+	Modified   string         `json:"modified"`
+	Identifier []Identifiers  `json:"identifier"`
 }
 
 type Paginator struct {
@@ -421,7 +425,7 @@ func allTargets(w http.ResponseWriter, r *http.Request) {
 		offset = (page - 1) * limit
 	}
 
-	rows, err := db.Raw("SELECT t.id, t.uuid, t.name, t.hosts, p.name FROM targets t, port_lists p WHERE t.port_list = p.id LIMIT ? OFFSET ?", limit, offset).Rows()
+	rows, err := db.Raw("SELECT t.id, t.uuid, t.name, t.hosts, t.reverse_lookup_only, t.reverse_lookup_unify, t.alive_test, p.id, p.name FROM targets t, port_lists p WHERE t.port_list = p.id LIMIT ? OFFSET ?", limit, offset).Rows()
 	if err != nil {
 		log.Print(err)
 		return
@@ -429,7 +433,7 @@ func allTargets(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		var target Target
-		err = rows.Scan(&target.Id, &target.Uuid, &target.Name, &target.Hosts, &target.PortList)
+		err = rows.Scan(&target.Id, &target.Uuid, &target.Name, &target.Hosts, &target.RLOnly, &target.RLUnify, &target.AliveTest, &target.PortListID, &target.PortList)
 		if err != nil {
 			log.Print(err)
 			return
@@ -551,7 +555,7 @@ func updateTarget(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&target)
 	var modified = time.Now().Unix()
 
-	db.Exec("UPDATE targets SET name = ?, hosts = ?, reverse_lookup_only = ?, reverse_lookup_unify= ?, comment = ?, port_list = ?, alive_test = ?, modification_time = ? WHERE id = ?", &target.Name, &target.Hosts, &target.RLOnly, &target.RLUnify, &target.Comment, &target.PortList, &target.AliveTest, &modified, &targetId)
+	db.Exec("UPDATE targets SET name = ?, hosts = ?, reverse_lookup_only = ?, reverse_lookup_unify= ?, comment = ?, port_list = ?, alive_test = ?, modification_time = ? WHERE id = ?", &target.Name, &target.Hosts, &target.RLOnly, &target.RLUnify, &target.Comment, &target.PortListID, &target.AliveTest, &modified, &targetId)
 
 }
 
@@ -663,7 +667,7 @@ func allTasks(w http.ResponseWriter, r *http.Request) {
 		offset = (page - 1) * limit
 	}
 
-	rows, err := db.Raw("SELECT t.id, t.uuid, t.name, t.run_status, t.target, r.count as reports, r.max as date, re.severity FROM tasks t LEFT JOIN (select task, count(id), max(date) from reports group by task) as r ON t.id = r.task LEFT JOIN (select task, max(severity) as severity from results group by task) as re ON t.id = re.task WHERE hidden = 0 LIMIT ? OFFSET ?", limit, offset).Rows()
+	rows, err := db.Raw("SELECT t.id, t.uuid, t.name, t.run_status, t.target, t.config, t.schedule, t.scanner, t.hosts_ordering, t.alterable, tp.max_checks, tp.max_hosts, tp.in_assets, tp.assets_apply_overrides, tp.assets_min_qod, tp.auto_delete, tp.auto_delete_data, r.count as reports, r.max as date, re.severity FROM tasks t LEFT JOIN (select task, count(id), max(date) from reports group by task) as r ON t.id = r.task LEFT JOIN (select task, max(severity) as severity from results group by task) as re ON t.id = re.task LEFT JOIN(select distinct tp.task, mc.value max_checks, mh.value max_hosts, ia.value in_assets, ao.value assets_apply_overrides, mq.value assets_min_qod, ad.value auto_delete, dd.value auto_delete_data from task_preferences tp inner join (select task, value from task_preferences where name='max_checks') as mc on tp.task = mc.task inner join (select task, value from task_preferences where name='max_hosts') as mh on tp.task = mh.task inner join (select task, value from task_preferences where name='in_assets') as ia on tp.task = ia.task inner join (select task, value from task_preferences where name='assets_apply_overrides') as ao on tp.task = ao.task inner join (select task, value from task_preferences where name='assets_min_qod') as mq on tp.task = mq.task inner join (select task, value from task_preferences where name='auto_delete') as ad on tp.task = ad.task inner join (select task, value from task_preferences where name='auto_delete_data') as dd on tp.task = dd.task) as tp on t.id = tp.task WHERE hidden = 0 LIMIT ? OFFSET ?", limit, offset).Rows()
 	if err != nil {
 		log.Print(err)
 		return
@@ -672,7 +676,7 @@ func allTasks(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var task Task
 		var last sql.NullString
-		err = rows.Scan(&task.Id, &task.Uuid, &task.Name, &task.Status, &task.Target, &task.ReportNumber, &last, &task.Severity)
+		err = rows.Scan(&task.Id, &task.Uuid, &task.Name, &task.Status, &task.Target, &task.Config, &task.Schedule, &task.Scanner, &task.Hosts_ordering, &task.Alterable, &task.Max_checks, &task.Max_hosts, &task.In_assets, &task.Assets_apply_overrides, &task.Assets_min_qod, &task.Auto_delete, &task.Auto_delete_data, &task.ReportNumber, &last, &task.Severity)
 		if err != nil {
 			log.Print(err)
 			return
@@ -689,32 +693,32 @@ func allTasks(w http.ResponseWriter, r *http.Request) {
 			task.LastReport = time.Unix(i, 0).Format(time.RFC850)
 		}
 		switch task.Status {
-			case "0":
-				task.Status = "Delete Requested"
-			case "1":
-				task.Status = "Done"
-			case "2":
-				task.Status = "New"
-			case "3":
-				task.Status = "Requested"
-			case "4":
-				task.Status = "Running"
-			case "10":
-				task.Status = "Stop Requested"
-			case "11":
-				task.Status = "Ultimate Delete Requested"
-			case "12":
-				task.Status = "Stopped"
-			case "13":
-				task.Status = "Interrupted"
-			case "14":
-				task.Status = "Ultimate Delete Waiting"
-			case "15":
-				task.Status = "Stop Request Giveup"
-			case "16":
-				task.Status = "Deleted Waiting"
-			case "17":
-				task.Status = "Ultimate Delete Waiting"
+		case "0":
+			task.Status = "Delete Requested"
+		case "1":
+			task.Status = "Done"
+		case "2":
+			task.Status = "New"
+		case "3":
+			task.Status = "Requested"
+		case "4":
+			task.Status = "Running"
+		case "10":
+			task.Status = "Stop Requested"
+		case "11":
+			task.Status = "Ultimate Delete Requested"
+		case "12":
+			task.Status = "Stopped"
+		case "13":
+			task.Status = "Interrupted"
+		case "14":
+			task.Status = "Ultimate Delete Waiting"
+		case "15":
+			task.Status = "Stop Request Giveup"
+		case "16":
+			task.Status = "Deleted Waiting"
+		case "17":
+			task.Status = "Ultimate Delete Waiting"
 		}
 
 		tasks = append(tasks, task)
@@ -811,7 +815,7 @@ func reportByTask(w http.ResponseWriter, r *http.Request) {
 			report.Status = "Deleted Waiting"
 		case "17":
 			report.Status = "Ultimate Delete Waiting"
-	}
+		}
 		i, err := strconv.ParseInt(report.Date, 10, 64)
 		if err != nil {
 			panic(err)
@@ -1565,31 +1569,31 @@ func allUser(w http.ResponseWriter, r *http.Request) {
 		offset = (page - 1) * limit
 	}
 
-	rows, err := db.Raw("SELECT u.id, u.uuid, u.name, ru.name, u.hosts, u.hosts_allow, u.ifaces_allow FROM users u INNER JOIN (select role_users.*, roles.name from role_users inner join roles on role_users.role = roles.id)as ru ON u.id = ru.user LIMIT ? OFFSET ?", limit, offset).Rows()
+	rows, err := db.Raw("SELECT u.id, u.uuid, u.name, u.password, ru.roleid, ru.name, u.hosts, u.hosts_allow, u.ifaces, u.ifaces_allow FROM users u INNER JOIN (select role_users.*, roles.id roleid, roles.name from role_users inner join roles on role_users.role = roles.id)as ru ON u.id = ru.user LIMIT ? OFFSET ?", limit, offset).Rows()
 	if err != nil {
 		log.Fatal(err)
 	}
 	for rows.Next() {
 		var user User
-		err = rows.Scan(&user.Id, &user.Uuid, &user.Name, &user.Role, &user.Hosts, &user.Host_allow, &user.Iface_allow)
+		err = rows.Scan(&user.Id, &user.Uuid, &user.Name, &user.Password, &user.RoleId, &user.Role, &user.Hosts, &user.Host_allow_number, &user.Ifaces, &user.Iface_allow_number)
 		if err != nil {
 			log.Print(err)
 			return
 		}
 		if user.Hosts == "" {
-			if user.Host_allow == "0" {
+			if user.Host_allow_number == "0" {
 				user.Host_allow = "Allow all"
-			} else if user.Host_allow == "1" {
+			} else if user.Host_allow_number == "1" {
 				user.Host_allow = "Deny all"
 			}
 		} else {
-			if user.Host_allow == "0" {
+			if user.Host_allow_number == "0" {
 				user.Host_allow = "Allow all and deny from " + user.Hosts
-			} else if user.Host_allow == "1" {
+			} else if user.Host_allow_number == "1" {
 				user.Host_allow = "Deny all and allow from " + user.Hosts
 			}
 		}
-		if user.Iface_allow == "0" || user.Iface_allow == "1" {
+		if user.Iface_allow_number == "0" || user.Iface_allow_number == "1" {
 			user.Iface_allow = "Local"
 		}
 
@@ -1647,15 +1651,15 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		var modified = time.Now().Unix()
 		// password, err := bcrypt.GenerateFromPassword([]byte(user.Password), 8)
 		// pass := string(password)
-		Host_allow, err := strconv.Atoi(user.Host_allow)
+		Host_allow, err := strconv.Atoi(user.Host_allow_number)
 		if err != nil {
 			fmt.Println("Error")
 		}
-		Iface_allow, err := strconv.Atoi(user.Iface_allow)
+		Iface_allow, err := strconv.Atoi(user.Iface_allow_number)
 		if err != nil {
 			fmt.Println("Error")
 		}
-		role, err := strconv.Atoi(user.Role)
+		role, err := strconv.Atoi(user.RoleId)
 		if err != nil {
 			fmt.Println("Error")
 		}
@@ -1673,15 +1677,15 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	var user User
 	_ = json.NewDecoder(r.Body).Decode(&user)
 	var modified = time.Now().Unix()
-	Host_allow, err := strconv.Atoi(user.Host_allow)
+	Host_allow, err := strconv.Atoi(user.Host_allow_number)
 	if err != nil {
 		fmt.Println("Error")
 	}
-	Iface_allow, err := strconv.Atoi(user.Iface_allow)
+	Iface_allow, err := strconv.Atoi(user.Iface_allow_number)
 	if err != nil {
 		fmt.Println("Error")
 	}
-	role, err := strconv.Atoi(user.Role)
+	role, err := strconv.Atoi(user.RoleId)
 	if err != nil {
 		fmt.Println("Error")
 	}

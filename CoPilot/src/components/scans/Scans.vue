@@ -5,7 +5,7 @@
         <div class="box">
           <div class="box-header">
             <!-- <router-link to="/createtarget"><i class="fa fa-user-plus" style="margin-right: 3px"></i> CREATE</router-link> -->
-            <button data-toggle="modal" data-target="#addTask" @click="showModal" id="btn-modal">{{ $t('action.createMsg') }}</button>
+            <button data-toggle="modal" class="btn btn-primary" data-target="#addTask" @click="showModal" id="btn-modal"><i class="fa fa-plus"></i>&nbsp;&nbsp;{{ $t('action.createMsg') }}</button>
             <addTask v-show="isModalVisible"
                           @close="closeModal"
             />
@@ -46,8 +46,8 @@
                         <td>{{task.severity.String}}</td>
                         <td>
                           <updatetask v-show="isModalVisible" @close="closeModal" :taskData="modalData" />                    
-                          <a data-toggle="modal" data-target="#updateTask" @click="showUpdateModal(task)" style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
-                          <a @click="deleteTask(task.id, index)"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
+                          <a data-toggle="modal" data-target="#updateTask" @click="showUpdateModal(task,index)" style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
+                          <a @click="deleteTask(task.id, index)" class="action-delete"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
                         </td>
                       </tr>
                     </tbody>
@@ -113,7 +113,7 @@ export default {
     showModal() {
       this.isModalVisible = true
     },
-    showUpdateModal(item) {
+    showUpdateModal(item, index) {
       this.isModalVisible = true
       this.modalData = item
     },

@@ -5,7 +5,7 @@
         <div class="box">
           <div class="box-header">
             <!-- <router-link to="/createtarget"><i class="fa fa-user-plus" style="margin-right: 3px"></i> CREATE</router-link> -->
-            <button data-toggle="modal" data-target="#myModal" @click="showModal">{{ $t('action.createMsg') }}</button>
+            <button data-toggle="modal" class="btn btn-primary" data-target="#myModal" @click="showModal"><i class="fa fa-plus"></i>&nbsp;&nbsp;{{ $t('action.createMsg') }}</button>
             <modal
               v-show="isModalVisible"
               @close="closeModal"
@@ -28,9 +28,9 @@
                     <thead>
                       <tr role="row">
                         <!-- <th style="width: 30px" aria-sort="ascending" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Id</th> -->
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('targets.nameMsg') }}</th>
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('targets.hostMsg') }}</th>
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('targets.portMsg') }}</th>
+                        <th colspan="1" width="25%" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('targets.nameMsg') }}</th>
+                        <th colspan="1" width="25%" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('targets.hostMsg') }}</th>
+                        <th colspan="1" width="30%" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('targets.portMsg') }}</th>
                         <th colspan="1" width="20%" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('action.nameMsg') }}</th>
                         <!-- <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0"></th> -->
                       </tr>
@@ -46,7 +46,7 @@
                         <td class="action-edit">  
                           <updatemodal v-show="isModalVisible" @close="closeModal" :targetData="modalData" />                    
                           <a data-toggle="modal" data-target="#updateTarget" @click="showUpdateModal(target)" style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
-                          <a @click="deleteTarget(target.id, index)"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
+                          <a @click="deleteTarget(target.id, index)" class="action-delete"> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
                         </td>
                       </tr>
                     </tbody>
@@ -190,5 +190,8 @@ table.dataTable thead .sorting_desc:after {
 }
 .pagination span{
   margin: 0px 10px
+}
+.action-delete{
+  color:red;
 }
 </style>

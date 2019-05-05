@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="myModal" class="modal fade" role="dialog">
+    <div id="createUser" class="modal fade" role="dialog">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -33,16 +33,16 @@
                 </div> -->
                 <div class="form-group">
                   <label for="role">{{ $t('users.roleMsg') }}</label>
-                  <select class="form-control" v-model="role">
+                  <select class="form-control" v-model="role_id">
                     <option v-for="r in roles" :key="r.id" v-bind:value="r.id">{{r.name}}</option>
                   </select>
                 </div>
                 <div class="form-group">
-                  <label class="control-label" for="host_allow">{{ $t('users.hostAccessMsg') }}</label>
+                  <label class="control-label" for="host_allow_number">{{ $t('users.hostAccessMsg') }}</label>
                   <div class="contentt">
                   <div class="optionn">
-                  <input type="radio" name="host_allow" v-model="host_allow" value="0" checked>{{ $t('users.allowanddeny') }}<br>
-                  <input type="radio" name="host_allow" v-model="host_allow" value="1" style="margin-left: 20px">{{ $t('users.denyandallow') }}<br>
+                  <input type="radio" name="host_allow_number" v-model="host_allow_number" value="0" checked>{{ $t('users.allowanddeny') }}<br>
+                  <input type="radio" name="host_allow_number" v-model="host_allow_number" value="1" style="margin-left: 20px">{{ $t('users.denyandallow') }}<br>
                   </div>
                   <div class="inputcontent">
                   <input v-model='hosts' type="text" name="hosts" class="form-control">
@@ -50,11 +50,11 @@
                   </div>
                 </div>
                 <div class="form-group">
-                  <label class="control-label" for="iface_allow">{{ $t('users.interface') }}</label>
+                  <label class="control-label" for="iface_allow_number">{{ $t('users.interface') }}</label>
                   <div class="contentt">
                   <div class="optionn">
-                  <input type="radio" name="iface_allow" v-model="iface_allow" value="0" checked>{{ $t('users.allowanddeny') }}<br>
-                  <input type="radio" name="iface_allow" v-model="iface_allow" value="1" style="margin-left: 20px">{{ $t('users.denyandallow') }}<br>
+                  <input type="radio" name="iface_allow_number" v-model="iface_allow_number" value="0" checked>{{ $t('users.allowanddeny') }}<br>
+                  <input type="radio" name="iface_allow_number" v-model="iface_allow_number" value="1" style="margin-left: 20px">{{ $t('users.denyandallow') }}<br>
                   </div>
                   <div class="inputcontent">
                   <input v-model='ifaces' type="text" name="ifaces" class="form-control">
@@ -82,10 +82,10 @@
         comment: '',
         password: '',
         // comfirm_password: '',
-        role: '',
-        host_allow: '0',
+        role_id: '',
+        host_allow_number: '0',
         hosts: [],
-        iface_allow: '0',
+        iface_allow_number: '0',
         ifaces: [],
         roles: [],
         message: ''
@@ -114,10 +114,10 @@
                 name: this.name,
                 comment: this.comment,
                 password: this.password,
-                role: this.role,
-                host_allow: this.host_allow,
+                role_id: this.role_id,
+                host_allow_number: this.host_allow_number,
                 hosts: this.hosts,
-                iface_allow: this.iface_allow,
+                iface_allow_number: this.iface_allow_number,
                 ifaces: this.ifaces
               }
             })
@@ -134,11 +134,7 @@
   }
 </script>
 <style>
-#myModal .form-group{
-    display: flex;
-    align-items: center;
-}
-#myModal label{
+#createUser label{
     min-width: 125px;
 }
 

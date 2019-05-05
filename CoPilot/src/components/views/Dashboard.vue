@@ -7,7 +7,7 @@
       <router-link to="/nvts">
       <div class="col-md-4 col-sm-6 col-xs-12">
         <info-box color-class="bg-aqua"
-                  :icon-classes="['ion', 'ion-ios-gear-outline']"
+                  title="NVT"
                   text="NVTs"
                   :number="dash.nvtNumber"></info-box>
       </div>
@@ -16,7 +16,7 @@
       <router-link to="/cves">
       <div class="col-md-4 col-sm-6 col-xs-12">
         <info-box color-class="bg-red"
-                  :icon-classes="['fa', 'fa-google-plus']"
+                  title="CVE"
                   text="CVES"
                   :number="dash.cveNumber"></info-box>
       </div>
@@ -27,7 +27,7 @@
       <router-link to="/cpes">
       <div class="col-md-4 col-sm-6 col-xs-12">
         <info-box color-class="bg-green"
-                  :icon-classes="['ion', 'ion-ios-cart-outline']"
+                  title="CPE"
                   text="CPES"
                   :number="dash.cpeNumber"></info-box>
       </div>
@@ -238,6 +238,13 @@ export default {
   text-align: center;
   vertical-align: middle;
   display: inherit;
+}
+.info-box-number {
+  font-size: 30px;
+}
+.info-box-title{
+  margin-top: .67em;
+  font-weight: 600;
 }
 .fullCanvas {
   width: 100%;
