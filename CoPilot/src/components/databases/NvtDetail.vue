@@ -13,7 +13,7 @@
               <h3>NVT: {{dt.name}}</h3>
                 <span>ID: {{dt.uuid}}</span><br>
                 <span>{{ $t('publishMsg') }}: {{dt.created}}</span> <br>
-                <span>Last updated: {{dt.modified}}</span><br>
+                <span>{{ $t('lastUpdate') }}: {{dt.modified}}</span><br>
             </div>
             <div class="nvt-infomation">
               <div class="nvt-summary" v-if='dt.tag.summary!=""'>
@@ -32,7 +32,7 @@
               <div class="detection">
                   <h3>{{ $t('nvts.detecMsg.name') }}</h3>
                   <div>{{dt.tag.vuldetect}}</div>
-                  <span> {{ $t('nvts.detecMsg.qod') }}:  {{dt.tag.qod_type}}({{dt.qod}})</span>
+                  <span> {{ $t('nvts.detecMsg.qod') }}:  {{dt.tag.qod_type}}&nbsp;({{dt.qod}})</span>
               </div>
               <div class="affected" v-if='dt.tag.affected!=""'>
                   <h3>{{ $t('nvts.affectMsg') }}</h3>
@@ -56,7 +56,7 @@
                 <h3>{{ $t('nvts.refer') }}</h3>
                 <div v-if='dt.cve != ""'>
                     <span>CVE</span><br>
-                  <router-link v-for="c in dt.cve" :key="c" :to="{ name: 'Cve Detail', params: {name: c }}">{{c}}<br>
+                  <router-link v-for="c in dt.cve" :key="c" :to="{ name: 'Chi tiết CVE', params: {name: c }}">{{c}}<br>
                   </router-link>
                 </div>
                 <div v-if='dt.xref != null'>

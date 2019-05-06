@@ -17,12 +17,15 @@
                 </div>
               </div>
               <div class="search">
-                <form v-on:submit.prevent="searchCpes()" class="search-form">
-                  <input class="search-content" v-model="search" type="text" placeholder="Tìm kiếm theo tiêu đề">
-                  <input class="se" type="submit" value="Tìm kiếm">
+                <form v-on:submit.prevent="searchCpes(1)" class="search-form">
+                  <input class="search-content form-control" v-model="search" type="text" placeholder="Tìm kiếm theo tiêu đề">
+                  <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
                 </form>
               </div>
-              <div class="row">
+              <div v-if="message" class="not-found">
+                {{message}}
+              </div>
+              <div class="row" v-if="!message">
                 <div class="col-sm-12 table-responsive">
                   <table aria-describedby="example1_info" role="grid" id="example1" class="table table-bordered table-striped dataTable">
                     <thead>
@@ -37,7 +40,7 @@
                     <tbody>
                       <tr class="odd" role="row" v-for="cpe in cpes" :key="cpe.id">
                         <td class="sorting_1">
-                          <router-link :to="{ name: 'Cpe Detail', params: {id: cpe.id }}">{{cpe.name}}</router-link></td>
+                          <router-link :to="{ name: 'Chi tiết CPE', params: {id: cpe.id }}">{{cpe.name}}</router-link></td>
                         <td>{{cpe.title.String}}</td>
                         <td>{{cpe.modified}}</td>
                         <td>{{cpe.cves}}</td>
@@ -48,12 +51,19 @@
                       
                     </tfoot>
                   </table>
-                  <div class="pagination">
+                  <div class="pagination" v-if="!this.searching">
                     <button class="btn btn-primary" v-on:click="fetchPaginate(1)" :disabled="pagination.page == 1"><i class="fa fa-angle-double-left"></i></button>
                     <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.prev_page)" :disabled="pagination.page == 1"><i class="fa fa-angle-left"></i></button>
-                    <span>Page {{ pagination.page }} of {{ pagination.total_page }} </span>
+                    <span>Trang {{ pagination.page }} / {{ pagination.total_page }} </span>
                     <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.next_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-right"></i></button>
                     <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.total_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-double-right"></i></button>
+                  </div>
+                  <div class="pagination" v-if="this.searching">
+                    <button class="btn btn-primary" v-on:click="fetchPaginate2(1)" :disabled="pagination.page == 1"><i class="fa fa-angle-double-left"></i></button>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate2(pagination.prev_page)" :disabled="pagination.page == 1"><i class="fa fa-angle-left"></i></button>
+                    <span>Trang {{ pagination.page }} / {{ pagination.total_page }} </span>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate2(pagination.next_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-right"></i></button>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate2(pagination.total_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-double-right"></i></button>
                   </div>
                 </div>
               </div>
@@ -80,7 +90,9 @@ export default {
       cpes: [],
       pagination: [],
       page: 1,
-      search: ''
+      search: '',
+      searching: false,
+      message: ''
     }
   },
   mounted() {
@@ -96,24 +108,31 @@ export default {
         let $this = this
         this.cpes = response.data.records
         $this.makePagination(response.data)
+        this.searching = false
       })
     },
-    searchCpes() {
+    searchCpes(page) {
       if (this.search === '') {
         this.getCpes(this.page)
       }
       // axios.get('http://localhost:8081/cpes/page/' + page)
       axios({
         method: 'get',
-        url: 'http://localhost:8081/cpes/page/' + this.page + '/search/' + this.search,
+        url: 'http://localhost:8081/cpes/page/' + page + '/search/' + this.search,
         data: {
           search: this.search
         }
       })
       .then(response => {
-        let $this = this
-        this.cpes = response.data.records
-        $this.makePagination(response.data)
+        if (response.data.records === null) {
+          this.message = 'Không tìm thấy kết quả!'
+        } else {
+          this.message = ''
+          let $this = this
+          this.cpes = response.data.records
+          this.searching = true
+          $this.makePagination(response.data)
+        }
       })
     },
     makePagination(data) {
@@ -127,6 +146,9 @@ export default {
     },
     fetchPaginate(page) {
       this.getCpes(page)
+    },
+    fetchPaginate2(page) {
+      this.searchCpes(page)
     }
   }
 }

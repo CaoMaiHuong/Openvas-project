@@ -52,14 +52,14 @@
           <div class="box-body">
             <div class="col-sm-6 col-xs-12">
               <p class="text-center">
-                <strong>NVTs by Severity Class (Total: {{nvttotal}})</strong>
+                <strong>NVTs theo độ nghiêm trọng (Tổng: {{nvttotal}})</strong>
               </p>
               <canvas id="nvtbyseverity"></canvas>
             </div>
             <hr class="visible-xs-block">
             <div class="col-sm-6 col-xs-12">
               <p class="text-center">
-                <strong>CVEs by Severity Class (Total: {{cvetotal}})</strong>
+                <strong>CVEs theo độ nghiêm trọng (Tổng: {{cvetotal}})</strong>
               </p>
               <canvas id="cvebyseverity"></canvas>
             </div>
@@ -125,7 +125,7 @@ export default {
         var pieConfig = {
           type: 'pie',
           data: {
-            labels: ['High', 'Medium', 'Low', 'Log', 'N/A'],
+            labels: ['Cao', 'Trung bình', 'Thấp', 'Log', 'N/A'],
             datasets: [{
               data: [response.data.high.Int64, response.data.medium.Int64, response.data.low.Int64, response.data.log.Int64, response.data.na.Int64],
               backgroundColor: ['rgb(216, 0, 0)', 'rgb(255, 165, 0)', 'rgb(135, 206, 235)', 'rgb(221, 221, 221)', 'rgb(192, 192, 192)'],
@@ -207,7 +207,7 @@ export default {
         var pieConfig = {
           type: 'pie',
           data: {
-            labels: ['High', 'Medium', 'Low', 'Log', 'N/A'],
+            labels: ['Cao', 'Trung bình', 'Thấp', 'Log', 'N/A'],
             datasets: [{
               data: [response.data.high.Int64, response.data.medium.Int64, response.data.low.Int64, response.data.log.Int64, response.data.na.Int64],
               backgroundColor: ['rgb(216, 0, 0)', 'rgb(255, 165, 0)', 'rgb(135, 206, 235)', 'rgb(221, 221, 221)', 'rgb(192, 192, 192)'],
@@ -248,5 +248,8 @@ export default {
 }
 .fullCanvas {
   width: 100%;
+}
+body{
+  font-size: 15px;
 }
 </style>

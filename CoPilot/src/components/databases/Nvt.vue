@@ -3,10 +3,6 @@
     <div class="row">
       <div class="col-md-12">
         <div class="box">
-          <!-- <div class="box-header">
-            <router-link to="/createuser"><i class="fa fa-user-plus" style="margin-right: 3px"></i> CREATE</router-link>
-          </div> -->
-          <!-- /.box-header -->
           <div class="box-body">
             <div class="dataTables_wrapper form-inline dt-bootstrap" id="example1_wrapper">
               <div class="row">
@@ -16,8 +12,16 @@
                   </div>
                 </div>
               </div>
-
-              <div class="row">
+              <div class="search">
+                <form v-on:submit.prevent="searchNvts(1)" class="search-form">
+                  <input class="search-content form-control" v-model="search" type="text" placeholder="Tìm kiếm theo tên">
+                  <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
+                </form>
+              </div>
+              <div v-if="message" class="not-found">
+                {{message}}
+              </div>
+              <div class="row" v-if="!message">
                 <div class="col-sm-12 table-responsive">
                   <table aria-describedby="example1_info" role="grid" id="example1" class="table table-bordered table-striped dataTable">
                     <thead>
@@ -35,11 +39,11 @@
                     <tbody>
                       <tr class="odd" role="row" v-for="nvt in nvts" :key="nvt.uuid">
                         <td class="sorting_1">
-                          <router-link :to="{ name:'Nvt Detail', params: {id: nvt.uuid }}">{{nvt.name}}</router-link></td>
+                          <router-link :to="{ name:'Chi tiết NVT', params: {id: nvt.uuid }}">{{nvt.name}}</router-link></td>
                         <td>{{nvt.family}}</td>
                         <td>{{nvt.created}}</td>
                         <td>{{nvt.modified}}</td>
-                        <td><router-link class="cve" v-for="cve in nvt.cve" :key="cve" :to="{ name: 'Cve Detail', params: {name: cve }}">{{cve}}&nbsp;&nbsp;&nbsp;</router-link></td>
+                        <td><router-link class="cve" v-for="cve in nvt.cve" :key="cve" :to="{ name: 'Chi tiết CVE', params: {name: cve }}">{{cve}}&nbsp;&nbsp;&nbsp;</router-link></td>
                         <td>{{nvt.severity}}</td>
                         <td>{{nvt.qod}}</td>
                       </tr>
@@ -49,12 +53,19 @@
                       
                     </tfoot>
                   </table>
-                  <div class="pagination">
-                    <button class="btn btn-primary" v-on:click="fetchPaginateNvts(1)" :disabled="pagination.page == 1"><i class="fa fa-angle-double-left"></i></button>
-                    <button class="btn btn-primary" v-on:click="fetchPaginateNvts(pagination.prev_page)" :disabled="pagination.page == 1"><i class="fa fa-angle-left"></i></button>
-                    <span>Page {{ pagination.page }} of {{ pagination.total_page }} </span>
-                    <button class="btn btn-primary" v-on:click="fetchPaginateNvts(pagination.next_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-right"></i></button>
-                    <button class="btn btn-primary" v-on:click="fetchPaginateNvts(pagination.total_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-double-right"></i></button>
+                  <div class="pagination" v-if="!this.searching">
+                    <button class="btn btn-primary" v-on:click="fetchPaginate(1)" :disabled="pagination.page == 1"><i class="fa fa-angle-double-left"></i></button>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.prev_page)" :disabled="pagination.page == 1"><i class="fa fa-angle-left"></i></button>
+                    <span>Trang {{ pagination.page }} / {{ pagination.total_page }} </span>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.next_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-right"></i></button>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.total_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-double-right"></i></button>
+                  </div>
+                  <div class="pagination" v-if="this.searching">
+                    <button class="btn btn-primary" v-on:click="fetchPaginate2(1)" :disabled="pagination.page == 1"><i class="fa fa-angle-double-left"></i></button>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate2(pagination.prev_page)" :disabled="pagination.page == 1"><i class="fa fa-angle-left"></i></button>
+                    <span>Trang {{ pagination.page }} / {{ pagination.total_page }} </span>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate2(pagination.next_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-right"></i></button>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate2(pagination.total_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-double-right"></i></button>
                   </div>
                 </div>
               </div>
@@ -80,27 +91,15 @@ export default {
     return {
       nvts: [],
       pagination: [],
-      page: 1
+      page: 1,
+      search: '',
+      searching: false,
+      message: ''
     }
   },
   mounted() {
     this.getNvt(this.page)
   },
-  // created() {
-  //   axios.get('http://localhost:8081/')
-  //   .then(response => {
-  //     let $this = this
-  //     this.users = response.data.records
-  //     $this.makePagination(response.data)
-  //     this.$nextTick(() => {
-  //       this.DataTable = $('#example1').DataTable(
-  //         // {
-  //         //   'pageLength': 11
-  //         // }
-  //       )
-  //     })
-  //   })
-  // },
   methods: {
     getNvt(page) {
       axios.get('http://localhost:8081/nvts/page/' + page)
@@ -110,14 +109,29 @@ export default {
         $this.makePagination(response.data)
       })
     },
-    // deleteUser: function(id) {
-    //   if (confirm('Do you really want to delete it?')) {
-    //     axios.delete('http://localhost:8081/user/' + id)
-    //     .then(response => {
-    //       location.reload()
-    //     })
-    //   }
-    // },
+    searchNvts(page) {
+      if (this.search === '') {
+        this.getNvt(this.page)
+      }
+      axios({
+        method: 'get',
+        url: 'http://localhost:8081/nvts/page/' + page + '/search/' + this.search,
+        data: {
+          search: this.search
+        }
+      })
+      .then(response => {
+        if (response.data.records === null) {
+          this.message = 'Không tìm thấy kết quả!'
+        } else {
+          this.message = ''
+          let $this = this
+          this.nvts = response.data.records
+          this.searching = true
+          $this.makePagination(response.data)
+        }
+      })
+    },
     makePagination(data) {
       let pagination = {
         page: data.page,
@@ -127,15 +141,13 @@ export default {
       }
       this.pagination = pagination
     },
-    fetchPaginateNvts(page) {
+    fetchPaginate(page) {
       this.getNvt(page)
+    },
+    fetchPaginate2(page) {
+      this.searchNvts(page)
     }
   }
-  // mounted() {
-  //   this.$nextTick(() => {
-  //     $('#example1').DataTable()
-  //   })
-  // }
 }
 </script>
 
@@ -179,5 +191,9 @@ table.dataTable thead .sorting_desc:after {
 }
 .cve{
   display: inline-flex;
+}
+
+.not-found{
+  margin-top: 20px;
 }
 </style>

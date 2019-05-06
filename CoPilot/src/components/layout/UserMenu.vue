@@ -8,12 +8,12 @@
     </a>
     <!-- Account Info and Menu -->
     <ul class="dropdown-menu">
-      <li class="user-header" style="height:auto;min-height:85px;padding-bottom:15px;">
+      <!-- <li class="user-header" style="height:auto;min-height:85px;padding-bottom:15px;">
         <p>
           <span>{{user.displayName}}</span>
           <small v-for="role in user.roles" :key="role">{{role}}</small>
         </p>
-      </li>
+      </li> -->
       <li class="user-footer">
         <a href="javascript:;" class="btn btn-default btn-flat btn-block">
           <i class="fa fa-sign-out"></i>
@@ -36,3 +36,9 @@ export default {
   }
 }
 </script>
+<style>
+  .navbar-nav>.user-menu>.dropdown-menu{
+    width: 100%;
+  }
+</style>
+

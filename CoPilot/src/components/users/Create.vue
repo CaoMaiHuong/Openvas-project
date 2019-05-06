@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="createUser" class="modal fade" role="dialog">
+    <div id="createUser" ref="modal" class="modal fade" role="dialog">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -13,7 +13,7 @@
               <form v-on:submit.prevent="createUser" class="create-user" style="padding: 0px">
                 <div class="form-group">
                   <label class="control-label" for="name">{{ $t('users.nameMsg') }}</label>
-                  <input class="form-control" v-model="name" name="name" v-validate="'required'" type="text">
+                  <input class="form-control" ref="name" v-model="name" name="name" v-validate="'required'" type="text">
                   <span v-if="errors.has('name')">{{ errors.first('name') }}</span>
                   <span v-if="message">{{message}}</span>
                 </div>
@@ -73,6 +73,7 @@
   </div>
 </template>
 <script>
+  // import $ from 'jquery'
   import axios from 'axios'
   export default {
     name: 'Tables',
@@ -103,6 +104,12 @@
         // }
       })
     },
+    // mounted() {
+    //   $(this.$refs.modal).on('hidden.bs.modal', () => {
+    //     this.name = ''
+    //     this.$refs.name.value = null
+    //   })
+    // },
     methods: {
       createUser() {
         this.$validator.validateAll().then(res => {
@@ -136,6 +143,12 @@
 <style>
 #createUser label{
     min-width: 125px;
+}
+#createUser .form-group{
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
 .optionn {

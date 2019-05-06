@@ -137,9 +137,11 @@
 <style>
 #updateModal .form-group{
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
     margin-bottom: 20px;
 }
+
 #updateModal label{
     min-width: 125px;
 }

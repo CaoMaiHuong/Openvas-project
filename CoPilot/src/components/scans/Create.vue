@@ -21,8 +21,8 @@
                 </div>
                 <div class="form-group">
                   <label class="control-label" for='target'>{{ $t('tasks.scanTarget') }}</label>
-                  <select onfocus='this.size=10;' onblur='this.size=1;' onchange='this.size=1; this.blur();' name="target" v-validate="'required'" class="form-control"  v-model="target">
-                    <option class= "choose-target" v-for="t in targets" :key="t.id" v-bind:value="t.id" name="target" >{{t.name}}</option>
+                  <select onfocus='this.size=10;' onblur='this.size=1;' onchange='this.size=1; this.blur();' name="target" class="form-control"  v-model="target">
+                    <option class= "choose-target" v-for="t in targets" :key="t.id" v-bind:value="t.id" >{{t.name}}</option>
                   </select>
                   <span v-if="errors.has('target')">{{ errors.first('target') }}</span>
                 </div>
@@ -35,9 +35,7 @@
                 <div class="form-group">
                   <label class="control-label" for='schedule'>{{ $t('tasks.schedule') }}</label>
                   <select class="form-control" v-model="schedule">
-                    <option value>Scan Config Default</option>
-                    <option>ICMP Ping</option>
-                    <option>ARP Ping</option>
+                    <option></option>
                   </select>
                 </div>
                 <div class="form-group result">
@@ -50,7 +48,7 @@
                   <input type="radio" name="assets_apply_overrides" v-model="assets_apply_overrides" value="yes">Có<br>
                   <input type="radio" name="assets_apply_overrides" style="margin-left: 30px;" v-model="assets_apply_overrides" value="no">Không<br>
                 </div>
-                <div class="form-group">
+                <div class="form-group assets_min_qod">
                   <label class="control-label" for='assets_min_qod'>{{ $t('tasks.minQod') }}</label>
                   <input type="number" class="form-control" name="assets_min_qod" v-model="assets_min_qod"><br>
                 </div>
@@ -63,7 +61,7 @@
                   <label class="control-label" for='auto_delete'>{{ $t('tasks.delReport.name') }}</label><br>
                   <input type="radio" onclick="document.getElementById('del_data').disabled = true;" name="auto_delete" v-model="auto_delete" value="no" >{{ $t('tasks.delReport.delReport1') }}<br>
                   <input type="radio" onclick="document.getElementById('del_data').disabled = false;" name="auto_delete" v-model="auto_delete" value="keep">{{ $t('tasks.delReport.delReport2') }}&nbsp;
-                  <input type="number" id="del_data" v-model="auto_delete_data" disabled>&nbsp;báo cáo mới nhất<br>
+                  <input type="number" class="delete-data" id="del_data" v-model="auto_delete_data" disabled>&nbsp;báo cáo mới nhất<br>
                 </div>
                 <div class="form-group">
                   <label class="control-label" for='scanner'>{{ $t('tasks.scanner') }}</label>
@@ -79,7 +77,7 @@
                 </div>
                 <div class="form-group">
                   <label class="control-label" for='network'>{{ $t('tasks.networkInterface') }}</label>
-                  <input type="text" class="form-control" v-model="network" name="network"><br>
+                  <input type="text" class="form-control" v-model="network" name="network">
                 </div>
                 <div class="form-group">
                   <label class="control-label" for='hosts_ordering'>{{ $t('tasks.orderTarget') }}</label>
@@ -89,19 +87,19 @@
                     <option value="reverse">Reverse</option>
                   </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group max_checks">
                   <label class="control-label" for='max_checks'>{{ $t('tasks.maxExecutedNvt') }}</label>
                   <input type="number"  class="form-control" v-model="max_checks" name="max_checks"><br>
                 </div>
-                <div class="form-group">
+                <div class="form-group max_hosts">
                   <label class="control-label" for='max_hosts'>{{ $t('tasks.maxScanned') }}</label>
                   <input type="number" class="form-control" v-model="max_hosts" name="max_hosts"><br>
                 </div>
-                <button type="submit" class="btn btn-primary" >Lưu</button>
+                
               </form>
           </div>
           <div class="modal-footer">
-              
+            <button type="submit"  @click="createTask()" class="btn btn-primary modal-submit" >Lưu</button>
           </div>
         </div>
       </div>
@@ -218,5 +216,30 @@
   }
   .result:last-child, .apply-override input:last-child, .alterable-task input:last-child {
     margin-left: 30px;
+  }
+  .assets_min_qod {
+    display: flex;
+    align-items: center;
+  }
+   .assets_min_qod label{
+     width: 90px;
+   }
+  .delete-data{
+    width: 50px;
+    text-align: center;
+  }
+  .max_checks, .max_hosts {
+    display: flex;
+    align-items: center;
+  }
+  .max_checks input, .max_hosts input{
+    width: 80px;
+    text-align: center;
+  }
+  .max_checks label, .max_hosts label{
+    margin-right: 15px;
+  }
+  .modal-submit {
+    margin-right: 20px;
   }
 </style>

@@ -70,6 +70,7 @@
 #myModal .form-group{
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
 }
 #myModal label{
     min-width: 125px;

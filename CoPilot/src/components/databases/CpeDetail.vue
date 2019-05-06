@@ -34,7 +34,7 @@
                       <tbody>
                         <tr class="odd" role="row" v-for="rp in dt.reportedVulnerabilites" :key="rp.cve">
                           <td class="sorting_1">
-                            <router-link :to="{ name: 'Cve Detail', params: {name: rp.cve }}">{{rp.cve}}</router-link></td>
+                            <router-link :to="{ name: 'Chi tiết CVE', params: {name: rp.cve }}">{{rp.cve}}</router-link></td>
                           <td>{{rp.severity}}</td>
                         </tr>
                       </tbody>

@@ -11,7 +11,7 @@
           <div class="host-name">
             <h3>Host: {{dt.name}}</h3>
             <span>ID: {{dt.uuid}}</span><br>
-            <span>{{ $t('createMsg') }} {{dt.created}}</span> <br>
+            <span>{{ $t('createMsg') }}: {{dt.created}}</span> <br>
             <span>{{ $t('lastUpdate') }}: {{dt.modified}}</span><br>
           </div>
           <div class="host-infomation">
@@ -39,7 +39,7 @@
                         <td>{{i.created}}</td>
                         <td>
                           <span>{{ $t('hosts.reportMsg') }} &nbsp; &nbsp;<router-link :to="{ name: 'Báo cáo', params: {id: i.source.report}}">{{i.source.report}}</router-link></span>
-                          <span v-if='i.source.nvt !=""'>(NTV  &nbsp; &nbsp;<router-link :to="{ name: 'Nvt Detail', params: {id: i.source.nvt }}">{{i.source.nvt}}</router-link>)</span>
+                          <span v-if='i.source.nvt !=""'>(NTV  &nbsp; &nbsp;<router-link :to="{ name: 'Chi tiết NVT', params: {id: i.source.nvt }}">{{i.source.nvt}}</router-link>)</span>
                         </td>
                       </tr>
                     </tbody>

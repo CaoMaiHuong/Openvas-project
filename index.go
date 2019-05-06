@@ -121,7 +121,7 @@ type Target struct {
 	Name          string        `json:"name"`
 	Hosts         string        `json:"hosts"`
 	PortList      string        `json:"portlist"`
-	PortListID      string        `json:"portlist_id"`
+	PortListID    string        `json:"portlist_id"`
 	Comment       string        `json:"comment"`
 	MaxNumberHost string        `json:"maxhost"`
 	RLOnly        string        `json:"rlonly"`
@@ -306,6 +306,7 @@ type Host struct {
 	Hostname   sql.NullString `json:"hostname"`
 	IpAddress  sql.NullString `json:"ipaddress"`
 	Severity   sql.NullString `json:"severity"`
+	Created   string         `json:"created"`
 	Modified   string         `json:"modified"`
 	Identifier []Identifiers  `json:"identifier"`
 }
@@ -449,10 +450,6 @@ func allTargets(w http.ResponseWriter, r *http.Request) {
 }
 
 func getTarget(w http.ResponseWriter, r *http.Request) {
-	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
 	var targets []Target
 	vars := mux.Vars(r)
 	targetId := vars["id"]
@@ -544,10 +541,6 @@ func createTarget(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateTarget(w http.ResponseWriter, r *http.Request) {
-	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
 	vars := mux.Vars(r)
 	targetId := vars["id"]
 
@@ -560,10 +553,6 @@ func updateTarget(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteTarget(w http.ResponseWriter, r *http.Request) {
-	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
 	vars := mux.Vars(r)
 	targetId := vars["id"]
 
@@ -572,10 +561,6 @@ func deleteTarget(w http.ResponseWriter, r *http.Request) {
 }
 
 func allPortList(w http.ResponseWriter, r *http.Request) {
-	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
 	var portLists []PortList
 	rows, err := db.Raw("SELECT id, name FROM port_lists").Rows()
 	if err != nil {
@@ -966,6 +951,60 @@ func allNvts(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(paginator)
 }
 
+func searchNvts(w http.ResponseWriter, r *http.Request) {
+	var nvts []Nvt
+	vars := mux.Vars(r)
+	search := vars["search"]
+	page, err := strconv.Atoi(vars["page"])
+
+	var offset int
+	limit := 5
+	if page == 1 {
+		offset = 0
+	} else {
+		offset = (page - 1) * limit
+	}
+
+	rows, err := db.Raw("SELECT id, uuid, name, family, creation_time, modification_time, cve, cvss_base, qod FROM nvts WHERE Lower(name) LIKE '%'  || lower(?) || '%' LIMIT ? OFFSET ?", search, limit, offset).Rows()
+	if err != nil {
+		log.Print(err)
+		return
+	}
+
+	for rows.Next() {
+		var nvt Nvt
+		var cve string
+		err = rows.Scan(&nvt.Id, &nvt.Uuid, &nvt.Name, &nvt.Family, &nvt.Created, &nvt.Modified, &cve, &nvt.Cvss_base, &nvt.Qod)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		c := " %"
+		nvt.Qod = nvt.Qod + string(c)
+		i, err := strconv.ParseInt(nvt.Created, 10, 64)
+		j, err := strconv.ParseInt(nvt.Modified, 10, 64)
+		if err != nil {
+			panic(err)
+		}
+		nvt.Created = time.Unix(i, 0).Format(time.RFC850)
+		nvt.Modified = time.Unix(j, 0).Format(time.RFC850)
+		nvt.Cve = strings.Split(cve, ",")
+		for i := range nvt.Cve {
+			nvt.Cve[i] = strings.TrimSpace(nvt.Cve[i])
+			if nvt.Cve[i] == "NOCVE" {
+				nvt.Cve[i] = ""
+			}
+		}
+		nvts = append(nvts, nvt)
+	}
+
+	var count int
+	row := db.Raw("Select count(*) from nvts WHERE Lower(name) LIKE '%'  || lower(?) || '%'", search).Row() // (*sql.Row)
+	row.Scan(&count)
+	paginator := Paging(page, limit, offset, count, &nvts)
+	json.NewEncoder(w).Encode(paginator)	
+}
+
 func getNvt(w http.ResponseWriter, r *http.Request) {
 	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
 	// if err != nil {
@@ -997,6 +1036,8 @@ func getNvt(w http.ResponseWriter, r *http.Request) {
 		}
 		nvt.Created = time.Unix(i, 0).Format(time.RFC850)
 		nvt.Modified = time.Unix(j, 0).Format(time.RFC850)
+		c := " %"
+		nvt.Qod = nvt.Qod + string(c)
 		nvt.Cve = strings.Split(cve, ",")
 		for i := range nvt.Cve {
 			nvt.Cve[i] = strings.TrimSpace(nvt.Cve[i])
@@ -1045,11 +1086,6 @@ func getNvt(w http.ResponseWriter, r *http.Request) {
 }
 
 func allCves(w http.ResponseWriter, r *http.Request) {
-	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
-	// var paginator Paginatorr
 	var cves []Cve
 	vars := mux.Vars(r)
 	page, err := strconv.Atoi(vars["page"])
@@ -1110,11 +1146,69 @@ func allCves(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(paginator)
 }
 
+func searchCves(w http.ResponseWriter, r *http.Request) {
+	var cves []Cve
+	vars := mux.Vars(r)
+	search := vars["search"]
+	page, err := strconv.Atoi(vars["page"])
+
+	var offset int
+	limit := 4
+	if page == 1 {
+		offset = 0
+	} else {
+		offset = (page - 1) * limit
+	}
+
+	rows, err := db.Raw("SELECT id, name, description, vector, complexity, authentication,  confidentiality_impact, integrity_impact, availability_impact, creation_time, cvss FROM scap.cves WHERE Lower(name) LIKE '%'  || lower(?) || '%' LIMIT ? OFFSET ?", search, limit, offset).Rows()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for rows.Next() {
+		var cve Cve
+		err = rows.Scan(&cve.Id, &cve.Name, &cve.Description, &cve.Vector, &cve.Complexity, &cve.Authentication, &cve.ConfidentialityImpact, &cve.IntegrityImpact, &cve.AvailabilityImpact, &cve.Published, &cve.Severity)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		i, err := strconv.ParseInt(cve.Published, 10, 64)
+		if err != nil {
+			panic(err)
+		}
+		cve.Published = time.Unix(i, 0).Format(time.RFC850)
+		if cve.Vector == "" {
+			cve.Vector = "N/A"
+		}
+		if cve.Complexity == "" {
+			cve.Complexity = "N/A"
+		}
+		if cve.Authentication == "" {
+			cve.Authentication = "N/A"
+		}
+		if cve.ConfidentialityImpact == "" {
+			cve.ConfidentialityImpact = "N/A"
+		}
+		if cve.IntegrityImpact == "" {
+			cve.IntegrityImpact = "N/A"
+		}
+		if cve.AvailabilityImpact == "" {
+			cve.AvailabilityImpact = "N/A"
+		}
+		if cve.Severity.Valid == false {
+			cve.Severity.String = "N/A"
+		}
+
+		cves = append(cves, cve)
+	}
+
+	var count int
+	row := db.Raw("Select count(*) from scap.cves WHERE Lower(name) LIKE '%'  || lower(?) || '%'", search).Row() // (*sql.Row)
+	row.Scan(&count)
+	paginator := Paging(page, limit, offset, count, &cves)
+	json.NewEncoder(w).Encode(paginator)
+}
+
 func getCve(w http.ResponseWriter, r *http.Request) {
-	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
 	var product string
 	vars := mux.Vars(r)
 	cveName := vars["name"]
@@ -1141,11 +1235,6 @@ func getCve(w http.ResponseWriter, r *http.Request) {
 		if cve.Severity.Valid == false {
 			cve.Severity.String = "N/A"
 		}
-		// cve.Product = strings.Split(product, " ")
-		// for i := range cve.Product {
-		// 	cve.Product[i] = strings.TrimSpace(cve.Product[i])
-
-		// }
 
 		rowss, err := db.Raw("select n.oid , n.name from scap.cves c inner join (select nc.oid,nc.cve_name, n.name from nvt_cves nc inner join nvts n on nc.nvt = n.id) as n on c.name = n.cve_name where c.name = ?", cveName).Rows()
 		if err != nil {
@@ -1238,8 +1327,6 @@ func searchCpes(w http.ResponseWriter, r *http.Request) {
 }
 func allCpes(w http.ResponseWriter, r *http.Request) {
 	var cpes []Cpe
-	// var search string
-	// _ = json.NewDecoder(r.Body).Decode(&search)
 	vars := mux.Vars(r)
 	page, err := strconv.Atoi(vars["page"])
 	var offset int
@@ -1283,10 +1370,6 @@ func allCpes(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(paginator)
 }
 func getCpe(w http.ResponseWriter, r *http.Request) {
-	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
 	vars := mux.Vars(r)
 	cpeId, err := strconv.Atoi(vars["id"])
 	// cpeName := vars["name"]
@@ -1399,13 +1482,13 @@ func getHost(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var hosts []Host
 	hostId := vars["id"]
-	rows, err := db.Raw("select h.id, h.uuid, h.name, hostname.value hostname, ip.value ip, h.modification_time, hs.severity from hosts h left join (select distinct hi.host, hi.value from (select host, max(modification_time) as modification_time from host_identifiers where name='hostname' group by host) as hos inner join host_identifiers as hi on hi.host = hos.host and hi.modification_time = hos.modification_time where hi.name='hostname' and hi.value NOT LIKE 'ww%') AS hostname on h.id = hostname.host left join (select hi.host, hi.value from (select host, max(modification_time) as modification_time from host_identifiers where name='ip' group by host) as hos inner join host_identifiers as hi on hi.host = hos.host and hi.modification_time = hos.modification_time where hi.name='ip') AS ip on h.id = ip.host left join (select distinct hs.host, hs.severity from (select host, MAX(creation_time) as creation_time from host_max_severities group by host) as hms inner join host_max_severities hs on hs.host = hms.host and hs.creation_time = hms.creation_time) as hs ON h.id = hs.host WHERE h.uuid = ?", &hostId).Rows()
+	rows, err := db.Raw("select h.id, h.uuid, h.name, hostname.value hostname, ip.value ip,h.creation_time, h.modification_time, hs.severity from hosts h left join (select distinct hi.host, hi.value from (select host, max(modification_time) as modification_time from host_identifiers where name='hostname' group by host) as hos inner join host_identifiers as hi on hi.host = hos.host and hi.modification_time = hos.modification_time where hi.name='hostname' and hi.value NOT LIKE 'ww%') AS hostname on h.id = hostname.host left join (select hi.host, hi.value from (select host, max(modification_time) as modification_time from host_identifiers where name='ip' group by host) as hos inner join host_identifiers as hi on hi.host = hos.host and hi.modification_time = hos.modification_time where hi.name='ip') AS ip on h.id = ip.host left join (select distinct hs.host, hs.severity from (select host, MAX(creation_time) as creation_time from host_max_severities group by host) as hms inner join host_max_severities hs on hs.host = hms.host and hs.creation_time = hms.creation_time) as hs ON h.id = hs.host WHERE h.uuid = ?", &hostId).Rows()
 	if err != nil {
 		log.Fatal(err)
 	}
 	for rows.Next() {
 		var host Host
-		err = rows.Scan(&host.Id, &host.Uuid, &host.Name, &host.Hostname, &host.IpAddress, &host.Modified, &host.Severity)
+		err = rows.Scan(&host.Id, &host.Uuid, &host.Name, &host.Hostname, &host.IpAddress, &host.Created, &host.Modified, &host.Severity)
 		if err != nil {
 			log.Print(err)
 			return
@@ -1414,10 +1497,12 @@ func getHost(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-		// if host.Severity.Valid == false {
-		// 	host.Severity.Float64= "N/A"
-		// }
 		host.Modified = time.Unix(i, 0).Format(time.RFC850)
+		j, err := strconv.ParseInt(host.Created, 10, 64)
+		if err != nil {
+			panic(err)
+		}
+		host.Created = time.Unix(j, 0).Format(time.RFC850)
 		if host.Hostname.Valid == false {
 			host.Hostname.String = ""
 		}
@@ -1726,15 +1811,20 @@ func main() {
 	// allowedMethods := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
 	myRouter := mux.NewRouter()
 	myRouter.HandleFunc("/login", login).Methods("POST")
+
+	// Dashboard
 	myRouter.HandleFunc("/dashboard", getDashboard).Methods("GET")
 	myRouter.HandleFunc("/cvebyseverity", cveBySeverity).Methods("GET")
 	myRouter.HandleFunc("/nvtbyseverity", nvtBySeverity).Methods("GET")
+	
+	// Users
 	myRouter.HandleFunc("/users/page/{page}", allUser).Methods("GET")
 	myRouter.HandleFunc("/roles", getRoles).Methods("GET")
 	myRouter.HandleFunc("/user/{id}", deleteUser).Methods("DELETE")
 	myRouter.HandleFunc("/user/{id}", updateUser).Methods("PUT")
 	myRouter.HandleFunc("/user", createUser).Methods("POST")
-	myRouter.HandleFunc("/targets/page/{page}", allTargets).Methods("GET")
+	
+	// Tasks
 	myRouter.HandleFunc("/tasks/page/{page}", allTasks).Methods("GET")
 	myRouter.HandleFunc("/task", createTask).Methods("POST")
 	myRouter.HandleFunc("/task/{id}", updateTask).Methods("PUT")
@@ -1744,17 +1834,30 @@ func main() {
 	myRouter.HandleFunc("/configs", allConfig).Methods("GET")
 	myRouter.HandleFunc("/reports/{uuid}/page/{page}", reportByTask).Methods("GET")
 	myRouter.HandleFunc("/report/{uuid}/page/{page}", getReport).Methods("GET")
+	
+	// Targets
+	myRouter.HandleFunc("/targets/page/{page}", allTargets).Methods("GET")
 	myRouter.HandleFunc("/target/{id}", getTarget).Methods("GET")
 	myRouter.HandleFunc("/target", createTarget).Methods("POST")
 	myRouter.HandleFunc("/target/{id}", updateTarget).Methods("PUT")
 	myRouter.HandleFunc("/target/{id}", deleteTarget).Methods("DELETE")
+	
+	//Nvts
 	myRouter.HandleFunc("/nvts/page/{page}", allNvts).Methods("GET")
 	myRouter.HandleFunc("/nvt/{id}", getNvt).Methods("GET")
+	myRouter.HandleFunc("/nvts/page/{page}/search/{search}", searchNvts).Methods("GET")
+	
+	// Cves
 	myRouter.HandleFunc("/cves/page/{page}", allCves).Methods("GET")
 	myRouter.HandleFunc("/cve/{name}", getCve).Methods("GET")
-	myRouter.HandleFunc("/cpes/page/{page}/search/{search}", searchCpes).Methods("GET")
+	myRouter.HandleFunc("/cves/page/{page}/search/{search}", searchCves).Methods("GET")
+	
+	// Cpes
 	myRouter.HandleFunc("/cpes/page/{page}", allCpes).Methods("GET")
 	myRouter.HandleFunc("/cpe/{id}", getCpe).Methods("GET")
+	myRouter.HandleFunc("/cpes/page/{page}/search/{search}", searchCpes).Methods("GET")
+	
+	// Hosts
 	myRouter.HandleFunc("/hosts/page/{page}", allHosts).Methods("GET")
 	myRouter.HandleFunc("/host/{id}", getHost).Methods("GET")
 	myRouter.HandleFunc("/host", createHost).Methods("POST")

@@ -54,7 +54,7 @@
                   <div class="pagination">
                     <button class="btn btn-primary" v-on:click="fetchPaginate(1)" :disabled="pagination.page == 1"><i class="fa fa-angle-double-left"></i></button>
                     <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.prev_page)" :disabled="pagination.page == 1"><i class="fa fa-angle-left"></i></button>
-                    <span>Page {{ pagination.page }} of {{ pagination.total_page }} </span>
+                    <span>Trang {{ pagination.page }} / {{ pagination.total_page }} </span>
                     <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.next_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-right"></i></button>
                     <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.total_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-double-right"></i></button>
                   </div>
@@ -113,7 +113,7 @@ export default {
       this.modalData = item
     },
     deleteUser: function(id, index) {
-      if (confirm('Do you really want to delete it?')) {
+      if (confirm('Bạn có chắc chắn muốn xóa?')) {
         axios.delete('http://localhost:8081/user/' + id)
         .then(response => {
           this.users.splice(index, 1)
@@ -183,7 +183,7 @@ table.dataTable thead .sorting_desc:after {
   border-radius: 0px;
   margin: 2px;
   background: none;
-  border:2px solid blue;
+  border:1px solid blue;
   color: blue;
   font-size: 16px;
   width: 37px;

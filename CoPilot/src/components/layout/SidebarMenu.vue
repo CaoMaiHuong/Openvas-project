@@ -12,10 +12,16 @@
         <span class="page">Target</span>
       </a>
     </router-link>
-    <router-link tag="li" class="pageLink" to="/scans">
+    <router-link tag="li" class="pageLink" to="/hosts">
+      <a>
+        <i class="fa fa-globe"></i>
+        <span class="page">Host</span>
+      </a>
+    </router-link>
+    <router-link tag="li" class="pageLink" to="/tasks">
       <a>
         <i class="fa fa-area-chart"></i>
-        <span class="page">Scan</span>
+        <span class="page">Tác vụ</span>
       </a>
     </router-link>
     <!-- <router-link tag="li" class="pageLink" to="/vulnerabilities">
@@ -33,19 +39,12 @@
     <li class="treeview">
       <a href="#">
         <i class="fa fa-folder-o"></i>
-        <span class="treeview-title">Database</span>
+        <span class="treeview-title">Tập mô hình mẫu</span>
         <span class="pull-right-container pull-right">
           <i class="fa fa-angle-left fa-fw"></i>
         </span>
       </a>
       <ul class="treeview-menu database-menu">
-        <li>
-          <router-link tag="li" class="pageLink" to="/hosts">
-          <a href="#">
-            <i class="fa fa-circle-o"></i> Hosts
-          </a>
-          </router-link>
-        </li>
         <li>
           <router-link tag="li" class="pageLink" to="/cves">
           <a href="#">

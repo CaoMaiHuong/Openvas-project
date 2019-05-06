@@ -7,7 +7,7 @@ import VeeValidate from 'vee-validate'
 // Import Views - Dash
 import DashboardView from './components/views/Dashboard.vue'
 import TablesView from './components/views/Tables.vue'
-import TasksView from './components/views/Tasks.vue'
+// import TasksView from './components/views/Tasks.vue'
 import SettingView from './components/views/Setting.vue'
 import AccessView from './components/views/Access.vue'
 import ServerView from './components/views/Server.vue'
@@ -59,12 +59,14 @@ const routes = [
         component: TablesView,
         name: 'Tables',
         meta: {description: 'Simple and advance table in CoPilot'}
-      }, {
-        path: 'tasks',
-        component: TasksView,
-        name: 'Tasks',
-        meta: {description: ''}
-      }, {
+      },
+      // {
+      //   path: 'tasks',
+      //   component: TasksView,
+      //   name: 'Tasks',
+      //   meta: {description: ''}
+      // },
+      {
         path: 'setting',
         component: SettingView,
         name: 'Settings',
@@ -97,14 +99,14 @@ const routes = [
       }, {
         path: '/target/:id',
         component: TargetDetail,
-        name: 'Target Detail',
+        name: 'Chi tiết Target',
         props: true,
         meta: {description: ''}
       }, {
-        path: 'scans',
+        path: 'tasks',
         component: ScansView,
-        name: 'Scans',
-        meta: {description: 'Danh sách task'}
+        name: 'Tác vụ',
+        meta: {description: 'Danh sách tác vụ'}
       }, {
         path: '/reports/:id',
         component: ReportByTask,
@@ -125,7 +127,7 @@ const routes = [
       }, {
         path: '/nvt/:id',
         component: NvtDetail,
-        name: 'Nvt Detail',
+        name: 'Chi tiết NVT',
         props: true,
         meta: {description: ''}
       }, {
@@ -136,7 +138,7 @@ const routes = [
       }, {
         path: '/cve/:name',
         component: CveDetail,
-        name: 'Cve Detail',
+        name: 'Chi tiết CVE',
         props: true,
         meta: {description: ''}
       }, {
@@ -147,7 +149,7 @@ const routes = [
       }, {
         path: '/cpe/:id',
         component: CpeDetail,
-        name: 'Cpe Detail',
+        name: 'Chi tiết CPE',
         props: true,
         meta: {description: ''}
       }, {
@@ -158,7 +160,7 @@ const routes = [
       }, {
         path: '/host/:id',
         component: HostDetail,
-        name: 'Host Detail',
+        name: 'Chi tiết Host',
         props: true,
         meta: {description: ''}
       }

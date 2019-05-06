@@ -16,8 +16,16 @@
                   </div>
                 </div>
               </div>
-
-              <div class="row">
+              <div class="search">
+                <form v-on:submit.prevent="searchCves(1)" class="search-form">
+                  <input class="search-content form-control" v-model="search" type="text" placeholder="Tìm kiếm theo tên">
+                  <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
+                </form>
+              </div>
+              <div v-if="message" class="not-found">
+                {{message}}
+              </div>
+              <div class="row" v-if="!message">  
                 <div class="col-sm-12 table-responsive">
                   <table aria-describedby="example1_info" role="grid" id="example1" class="table table-bordered table-striped dataTable">
                     <thead>
@@ -37,7 +45,7 @@
                     <tbody v-for="cve in cves" :key="cve.id">
                       <tr class="odd" role="row" >
                         <td class="sorting_1" rowspan = "2">
-                          <router-link :to="{ name: 'Cve Detail', params: {name: cve.name }}">{{cve.name}}</router-link>
+                          <router-link :to="{ name: 'Chi tiết CVE', params: {name: cve.name }}">{{cve.name}}</router-link>
                           </td>
                         <td>{{cve.vector}}</td>
                         <td>{{cve.complexity}}</td>
@@ -57,12 +65,19 @@
                       
                     </tfoot>
                   </table>
-                  <div class="pagination">
+                  <div class="pagination" v-if="!this.searching">
                     <button class="btn btn-primary" v-on:click="fetchPaginate(1)" :disabled="pagination.page == 1"><i class="fa fa-angle-double-left"></i></button>
                     <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.prev_page)" :disabled="pagination.page == 1"><i class="fa fa-angle-left"></i></button>
-                    <span>Page {{ pagination.page }} of {{ pagination.total_page }} </span>
+                    <span>Trang {{ pagination.page }} / {{ pagination.total_page }} </span>
                     <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.next_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-right"></i></button>
                     <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.total_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-double-right"></i></button>
+                  </div>
+                  <div class="pagination" v-if="this.searching">
+                    <button class="btn btn-primary" v-on:click="fetchPaginate2(1)" :disabled="pagination.page == 1"><i class="fa fa-angle-double-left"></i></button>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate2(pagination.prev_page)" :disabled="pagination.page == 1"><i class="fa fa-angle-left"></i></button>
+                    <span>Trang {{ pagination.page }} / {{ pagination.total_page }} </span>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate2(pagination.next_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-right"></i></button>
+                    <button class="btn btn-primary" v-on:click="fetchPaginate2(pagination.total_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-double-right"></i></button>
                   </div>
                 </div>
               </div>
@@ -88,7 +103,10 @@ export default {
     return {
       cves: [],
       pagination: [],
-      page: 1
+      page: 1,
+      search: '',
+      searching: false,
+      message: ''
     }
   },
   mounted() {
@@ -104,14 +122,30 @@ export default {
         $this.makePagination(response.data)
       })
     },
-    // deleteUser: function(id) {
-    //   if (confirm('Do you really want to delete it?')) {
-    //     axios.delete('http://localhost:8081/user/' + id)
-    //     .then(response => {
-    //       location.reload()
-    //     })
-    //   }
-    // },
+    searchCves(page) {
+      if (this.search === '') {
+        this.getCve(this.page)
+      }
+      // axios.get('http://localhost:8081/cpes/page/' + page)
+      axios({
+        method: 'get',
+        url: 'http://localhost:8081/cves/page/' + page + '/search/' + this.search,
+        data: {
+          search: this.search
+        }
+      })
+      .then(response => {
+        if (response.data.records === null) {
+          this.message = 'Không tìm thấy kết quả!'
+        } else {
+          this.message = ''
+          let $this = this
+          this.cves = response.data.records
+          this.searching = true
+          $this.makePagination(response.data)
+        }
+      })
+    },
     makePagination(data) {
       let pagination = {
         page: data.page,
@@ -123,6 +157,9 @@ export default {
     },
     fetchPaginate(page) {
       this.getCve(page)
+    },
+    fetchPaginate2(page) {
+      this.searchCves(page)
     }
   }
   // mounted() {

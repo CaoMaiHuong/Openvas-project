@@ -1,15 +1,15 @@
 <template>
   <header class="main-header">
     <span class="logo-mini">
-      <a href="/"><img src="/static/img/copilot-logo-white.svg" alt="Logo" class="img-responsive center-block logo"></a>
+      <a href="/"><img src="/static/img/81a6fc4f9c.svg" alt="Logo" class="img-responsive center-block logo"></a>
     </span>
     <!-- Header Navbar -->
-    <nav class="navbar navbar-static-top" role="navigation">
+    <nav class="navbar navbar-static-top" role="navigation"> 
       <!-- Sidebar toggle button-->
       <a href="javascript:;" class="sidebar-toggle" data-toggle="offcanvas" role="button">
         <span class="sr-only">Toggle navigation</span>
       </a>
-
+      <span class="web-name">HỆ THỐNG QUẢN LÝ RỦI RO AN TOÀN THÔNG TIN</span>
       <!-- Navbar Right Menu -->
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
@@ -46,3 +46,11 @@ export default {
   }
 }
 </script>
+<style>
+  .web-name{
+    float: left;
+    padding: 11px;
+    color: #fff;
+    font-size: 20px;
+  }
+</style>
