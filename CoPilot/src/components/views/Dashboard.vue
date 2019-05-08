@@ -125,11 +125,11 @@ export default {
         var pieConfig = {
           type: 'pie',
           data: {
-            labels: ['Cao', 'Trung bình', 'Thấp', 'Log', 'N/A'],
+            labels: ['Cao', 'Trung bình', 'Thấp', 'Đã lưu vết', 'N/A'],
             datasets: [{
               data: [response.data.high.Int64, response.data.medium.Int64, response.data.low.Int64, response.data.log.Int64, response.data.na.Int64],
-              backgroundColor: ['rgb(216, 0, 0)', 'rgb(255, 165, 0)', 'rgb(135, 206, 235)', 'rgb(221, 221, 221)', 'rgb(192, 192, 192)'],
-              hoverBackgroundColor: ['rgb(216, 0, 0)', 'rgb(255, 165, 0)', 'rgb(135, 206, 235)', 'rgb(221, 221, 221)', 'rgb(192, 192, 192)']
+              backgroundColor: ['rgb(216, 0, 0)', 'rgb(255, 165, 0)', 'rgb(135, 206, 235)', 'rgb(192, 192, 192)', 'rgb(119, 111, 110)'],
+              hoverBackgroundColor: ['rgb(216, 0, 0)', 'rgb(255, 165, 0)', 'rgb(135, 206, 235)', 'rgb(192, 192, 192)', 'rgb(119, 111, 110)']
             }]
           },
           options: {
@@ -207,11 +207,11 @@ export default {
         var pieConfig = {
           type: 'pie',
           data: {
-            labels: ['Cao', 'Trung bình', 'Thấp', 'Log', 'N/A'],
+            labels: ['Cao', 'Trung bình', 'Thấp', 'Đã lưu vết', 'N/A'],
             datasets: [{
               data: [response.data.high.Int64, response.data.medium.Int64, response.data.low.Int64, response.data.log.Int64, response.data.na.Int64],
-              backgroundColor: ['rgb(216, 0, 0)', 'rgb(255, 165, 0)', 'rgb(135, 206, 235)', 'rgb(221, 221, 221)', 'rgb(192, 192, 192)'],
-              hoverBackgroundColor: ['rgb(216, 0, 0)', 'rgb(255, 165, 0)', 'rgb(135, 206, 235)', 'rgb(221, 221, 221)', 'rgb(192, 192, 192)']
+              backgroundColor: ['rgb(216, 0, 0)', 'rgb(255, 165, 0)', 'rgb(135, 206, 235)', 'rgb(192, 192, 192)', 'rgb(119, 111, 110)'],
+              hoverBackgroundColor: ['rgb(216, 0, 0)', 'rgb(255, 165, 0)', 'rgb(135, 206, 235)', 'rgb(192, 192, 192)', 'rgb(119, 111, 110)']
             }]
           },
           options: {

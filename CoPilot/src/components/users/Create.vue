@@ -61,11 +61,11 @@
                   </div>
                   </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Lưu</button>
+                
               </form>
           </div>
           <div class="modal-footer">
-              
+            <button type="submit" @click="createUser()" class="btn btn-primary">Lưu</button>
           </div>
         </div>
       </div>
@@ -125,7 +125,8 @@
                 host_allow_number: this.host_allow_number,
                 hosts: this.hosts,
                 iface_allow_number: this.iface_allow_number,
-                ifaces: this.ifaces
+                ifaces: this.ifaces,
+                owner: localStorage.getItem('id')
               }
             })
             .then(response => {

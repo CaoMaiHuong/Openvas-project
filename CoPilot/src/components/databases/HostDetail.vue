@@ -20,16 +20,16 @@
             <span> {{ $t('commentMsg') }}: {{dt.comment}}<br></span>
             <span> {{ $t('severityMsg') }}:  {{dt.severity.String}}<br></span>
             <div class="latest-identifiers">
-              <h3>Latest Identifiers</h3>
+              <h3>{{ $t('hosts.lastestId') }}</h3>
               <div v-if='dt.identifier != null'>
                 <div class="col-sm-12 table-responsive">
                   <table aria-describedby="example1_info" role="grid" id="example1" class="table table-bordered table-striped dataTable">
                     <thead>
                       <tr role="row">
                         <th style="width: 15%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('hosts.nameMsg') }}</th>
-                        <th style="width: 30%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Value</th>
+                        <th style="width: 25%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('hosts.value') }}</th>
                         <th style="width: 25%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('createMsg') }}</th>
-                        <th style="width: 30%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >Source</th>
+                        <th style="width: 30%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('hosts.source') }}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -46,7 +46,7 @@
                   </table>
                 </div>
               </div>
-              <div v-else>None</div>
+              <div v-else>Không</div>
             </div>
           </div>
         </div>

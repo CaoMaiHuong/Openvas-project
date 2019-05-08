@@ -74,7 +74,10 @@ const messages = {
       nameMsg: 'Name',
       hostnameMsg: 'Hostname',
       ipMsg: 'IP Address',
-      reportMsg: 'Report'
+      reportMsg: 'Report',
+      lastestId: 'Latest Identifiers',
+      value: 'Value',
+      source: 'Source'
     },
     cves: {
       nameMsg: 'Name',
@@ -123,7 +126,7 @@ const messages = {
   'vi': {
     dashboardMsg: 'Trang chủ',
     usermanaMsg: 'Quản lý người dùng',
-    severityMsg: 'Độ nghiêm trọng',
+    severityMsg: 'Mức độ rủi ro',
     createMsg: 'Ngày tạo',
     publishMsg: 'Công bố',
     modifyMsg: 'Ngày sửa đổi',
@@ -142,35 +145,35 @@ const messages = {
       portMsg: 'Danh sách cổng',
       targetListMsg: 'Danh sách target',
       includedMsg: 'Included',
-      rlOnlyMsg: 'Reverse Lookup Only',
-      rlUnifyMsg: 'Reverse Lookup Unify',
-      aliveTestMsg: 'Alive Test',
-      tasksMsg: 'Các tasks sử dụng target'
+      rlOnlyMsg: 'Chỉ tra cứu ngược',
+      rlUnifyMsg: 'Hợp nhất tra cứu ngược',
+      aliveTestMsg: 'Kiểm tra trạng thái',
+      tasksMsg: 'Các tác vụ sử dụng target'
     },
     tasks: {
       nameMsg: 'Tên',
       status: 'Trạng thái',
       report: 'Báo cáo',
       lastReport: 'Báo cáo cuối cùng',
-      severity: 'Độ nghiêm trọng',
+      severity: 'Mức độ rủi ro',
       scanTarget: 'Đích quét',
       alert: 'Cảnh báo',
-      schedule: 'Schedule',
+      schedule: 'Lịch quét',
       addResult: 'Thêm kết quả vào tài sản',
       apply: 'Áp dụng ghi đè',
-      minQod: 'Min QoD',
-      alterableTask: 'Alterable Task',
+      minQod: 'Chất lượng phát hiện nhỏ nhất',
+      alterableTask: 'Cho phép sửa đổi',
       delReport: {
         name: 'Tự động xóa báo cáo',
         delReport1: 'Không tự động xóa báo cáo',
         delReport2: 'Tự động xóa các báo cáo cũ nhất nhưng luôn giữ'
       },
-      scanner: 'Scanner ',
+      scanner: 'Bộ dò quét',
       scanConfig: 'Cấu hình quét',
-      networkInterface: 'Network Source Interface',
-      orderTarget: 'Order for target hosts',
-      maxExecutedNvt: 'NVT tối đa được thực hiện đồng thời trên mỗi máy chủ',
-      maxScanned: 'Máy chủ được quét đồng thời tối đa',
+      networkInterface: 'Giao diện thiết bị mạng',
+      orderTarget: 'Thứ tự thi hành',
+      maxExecutedNvt: 'Số luồng dò quét đồng thời tối đa cho mỗi hệ thống',
+      maxScanned: 'Số lượng hệ thống được dò quét đồng thời tối đa',
       date: 'Ngày',
       vul: 'Lỗ hổng',
       location: 'Giao thức'
@@ -189,9 +192,12 @@ const messages = {
     hosts: {
       hostList: 'Danh sách Host',
       nameMsg: 'Tên',
-      hostnameMsg: 'Hostname',
+      hostnameMsg: 'Tên hệ thống',
       ipMsg: 'Địa chỉ IP',
-      reportMsg: 'Báo cáo'
+      reportMsg: 'Báo cáo',
+      lastestId: 'Thông tin dò quét hệ thống',
+      value: 'Giá trị',
+      source: 'Nguồn báo cáo'
     },
     cves: {
       nameMsg: 'Tên',
@@ -204,8 +210,8 @@ const messages = {
       cveListMsg: 'Danh sách CVE',
       baseScoreMsg: 'Base Score',
       descripMsg: 'Mô tả',
-      vulProductMsg: 'Vulnerable Products',
-      nvtAddressMsg: 'NVTs addressing this CVE'
+      vulProductMsg: 'Các hệ thống bị ảnh hưởng',
+      nvtAddressMsg: 'Mẫu NVT dành cho CVE'
     },
     cpes: {
       nameMsg: 'Tên',
@@ -215,21 +221,21 @@ const messages = {
     },
     nvts: {
       nameMsg: 'Tên',
-      familyMsg: 'Family',
+      familyMsg: 'Nhóm',
       qodMsg: 'Qod',
       nvtListMsg: 'Danh sách NVT',
       summaryMsg: 'Tóm tắt',
       scoring: {
-        name: 'Scoring',
+        name: 'Trọng số đánh giá',
         base: 'CVSS Base',
         baseVector: 'CVSS Base Vector'
       },
-      insightMsg: 'Insight',
+      insightMsg: 'Mô tả',
       detecMsg: {
         name: 'Phương pháp phát hiện',
         qod: 'Chất lượng phát hiện'
       },
-      affectMsg: 'Affected Software/OS',
+      affectMsg: 'Hệ thống bị ảnh hưởng',
       impactMsg: 'Tác động',
       solutionMsg: 'Giải pháp',
       solutionType: 'Loại giải pháp',

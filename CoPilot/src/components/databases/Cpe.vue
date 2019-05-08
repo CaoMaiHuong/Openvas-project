@@ -18,7 +18,7 @@
               </div>
               <div class="search">
                 <form v-on:submit.prevent="searchCpes(1)" class="search-form">
-                  <input class="search-content form-control" v-model="search" type="text" placeholder="Tìm kiếm theo tiêu đề">
+                  <input style="width:250px" class="search-content form-control" v-model="search" name="search" v-validate="'required'" type="text" placeholder="Tìm kiếm theo tiêu đề">
                   <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
                 </form>
               </div>
@@ -31,8 +31,8 @@
                     <thead>
                       <tr role="row">
                         <th style="width: 30%" aria-sort="ascending" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('cpes.nameMsg') }}</th>
-                        <th style="width: 30%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('cpes.titleMsg') }}</th>
-                        <th style="width: 20%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('modifyMsg') }}</th>
+                        <th style="width: 23%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('cpes.titleMsg') }}</th>
+                        <th style="width: 27%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('modifyMsg') }}</th>
                         <th style="width: 10%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">Cves</th>
                         <th style="width: 10%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('severityMsg') }}</th>
                       </tr>
@@ -112,26 +112,28 @@ export default {
       })
     },
     searchCpes(page) {
-      if (this.search === '') {
-        this.getCpes(this.page)
-      }
-      // axios.get('http://localhost:8081/cpes/page/' + page)
-      axios({
-        method: 'get',
-        url: 'http://localhost:8081/cpes/page/' + page + '/search/' + this.search,
-        data: {
-          search: this.search
-        }
-      })
-      .then(response => {
-        if (response.data.records === null) {
-          this.message = 'Không tìm thấy kết quả!'
+      this.$validator.validateAll().then(res => {
+        if (res) {
+          axios({
+            method: 'get',
+            url: 'http://localhost:8081/cpes/page/' + page + '/search/' + this.search,
+            data: {
+              search: this.search
+            }
+          })
+          .then(response => {
+            if (response.data.records === null) {
+              this.message = 'Không tìm thấy kết quả!'
+            } else {
+              this.message = ''
+              let $this = this
+              this.cpes = response.data.records
+              this.searching = true
+              $this.makePagination(response.data)
+            }
+          })
         } else {
-          this.message = ''
-          let $this = this
-          this.cpes = response.data.records
-          this.searching = true
-          $this.makePagination(response.data)
+          this.getCpes(this.page)
         }
       })
     },

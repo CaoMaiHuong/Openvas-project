@@ -20,11 +20,11 @@
                   <label class="control-label" for="comment">{{ $t('commentMsg') }}</label>
                   <input class="form-control" v-model="hostData.comment" name="comment" type="text">
                 </div>
-                <button type="submit" class="btn btn-primary">Lưu</button>
+                
               </form>
           </div>
           <div class="modal-footer">
-              
+            <button type="submit" @click="updateHost()" class="btn btn-primary">Lưu</button>
           </div>
         </div>
       </div>

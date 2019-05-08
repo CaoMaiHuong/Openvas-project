@@ -14,7 +14,7 @@
               </div>
               <div class="search">
                 <form v-on:submit.prevent="searchNvts(1)" class="search-form">
-                  <input class="search-content form-control" v-model="search" type="text" placeholder="Tìm kiếm theo tên">
+                  <input style="width:250px" class="search-content form-control" v-model="search" type="text" name="search" v-validate="'required'" placeholder="Tìm kiếm theo tên">
                   <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
                 </form>
               </div>
@@ -110,25 +110,28 @@ export default {
       })
     },
     searchNvts(page) {
-      if (this.search === '') {
-        this.getNvt(this.page)
-      }
-      axios({
-        method: 'get',
-        url: 'http://localhost:8081/nvts/page/' + page + '/search/' + this.search,
-        data: {
-          search: this.search
-        }
-      })
-      .then(response => {
-        if (response.data.records === null) {
-          this.message = 'Không tìm thấy kết quả!'
+      this.$validator.validateAll().then(res => {
+        if (res) {
+          axios({
+            method: 'get',
+            url: 'http://localhost:8081/nvts/page/' + page + '/search/' + this.search,
+            data: {
+              search: this.search
+            }
+          })
+          .then(response => {
+            if (response.data.records === null) {
+              this.message = 'Không tìm thấy kết quả!'
+            } else {
+              this.message = ''
+              let $this = this
+              this.nvts = response.data.records
+              this.searching = true
+              $this.makePagination(response.data)
+            }
+          })
         } else {
-          this.message = ''
-          let $this = this
-          this.nvts = response.data.records
-          this.searching = true
-          $this.makePagination(response.data)
+          this.getNvt(this.page)
         }
       })
     },

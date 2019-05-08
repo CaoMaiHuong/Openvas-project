@@ -28,7 +28,7 @@
                         <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0" style="background:rgb(135, 206, 235)">Low</th>
                         <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0" style="background:rgb(221, 221, 221)">Log</th>
                         <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0" style="background:rgb(192, 192, 192)">False Pos.</th>
-                        <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('action.nameMsg') }}</th>
+                        <!-- <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('action.nameMsg') }}</th> -->
                         <!-- <th colspan="1" rowspan="1" aria-controls="example1" tabindex="0"></th> -->
                       </tr>
                     </thead>
@@ -44,10 +44,10 @@
                         <td>{{report.rank.low.Int64}}</td>
                         <td>{{report.rank.log.Int64}}</td>
                         <td>{{report.rank.na.Int64}}</td>
-                        <td class="action-edit">
+                        <!-- <td class="action-edit">
                           <a style="margin-right: 20px"><i class="fa fa-pencil" style="margin-right: 5px"></i>{{ $t('action.editMsg') }}</a>
                           <a> <i class="fa fa-trash" style="margin-right: 5px"></i>{{ $t('action.deleteMsg') }}</a>
-                        </td>
+                        </td> -->
                       </tr>
                     </tbody>
                     

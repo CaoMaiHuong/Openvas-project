@@ -5,7 +5,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <span class="modal-header__title">
-              Sửa đổi task
+              Sửa đổi tác vụ
             </span>
             <button type="button" class="close" data-dismiss="modal">&times;</button>  
           </div>

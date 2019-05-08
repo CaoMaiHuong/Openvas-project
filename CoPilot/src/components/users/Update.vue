@@ -5,25 +5,27 @@
         <div class="modal-content">
           <div class="modal-header">
             <span class="modal-header__title">
-              Tạo mới người dùng
+              Sửa đổi thông tin người dùng
             </span>
             <button type="button" class="close" data-dismiss="modal">&times;</button>  
           </div>
           <div class="modal-body">   
               <form v-on:submit.prevent="updateUser(userData.id)" class="create-user" style="padding: 0px">
+                <!--{{userData}} -->
+                {{getName}}
                 <div class="form-group">
                   <label class="control-label" for="name">{{ $t('users.nameMsg') }}</label>
-                  <input class="form-control" v-model="userData.name" name="name" v-validate="'required'" type="text">
+                  <input class="form-control" v-model="getName" name="name" v-validate="'required'" type="text">
                   <span v-if="errors.has('name')">{{ errors.first('name') }}</span>
                   <span v-if="message">{{message}}</span>
                 </div>
                 <div class="form-group">
                   <label class="control-label" for="comment">{{ $t('commentMsg') }}</label>
-                  <input class="form-control" v-model="userData.comment" name="comment" type="text">
+                  <input class="form-control" v-model="comment" name="comment" type="text">
                 </div>
                 <div class="form-group">
                   <label class="control-label" for='password'>{{ $t('users.passwordMsg') }}</label>
-                  <input v-validate="'required|min:6'" v-model='userData.password' name="password" type="password" class="form-control" ref="password">
+                  <input v-validate="'required|min:6'" v-model='password' name="password" type="password" class="form-control" ref="password">
                   <span v-if="errors.has('password')">{{ errors.first('password') }}</span>
                 </div>
                 <!-- <div class="form-group">
@@ -33,7 +35,7 @@
                 </div> -->
                 <div class="form-group">
                   <label for='role'>{{ $t('users.roleMsg') }}</label>
-                  <select class="form-control" v-model="userData.role_id">
+                  <select class="form-control" v-model="role_id">
                     <option v-for="r in roles" :key="r.id" v-bind:value="r.id">{{r.name}}</option>
                   </select>
                 </div>
@@ -41,11 +43,11 @@
                   <label class="control-label" for="host_allow">{{ $t('users.hostAccessMsg') }}</label>
                   <div class="contentt">
                   <div class="optionn">
-                  <input type="radio" name="host_allow" v-model="userData.host_allow_number" value="0" checked>{{ $t('users.allowanddeny') }}<br>
-                  <input type="radio" name="host_allow" v-model="userData.host_allow_number" value="1" style="margin-left: 20px">{{ $t('users.denyandallow') }}<br>
+                  <input type="radio" name="host_allow" v-model="host_allow_number" value="0" checked>{{ $t('users.allowanddeny') }}<br>
+                  <input type="radio" name="host_allow" v-model="host_allow_number" value="1" style="margin-left: 20px">{{ $t('users.denyandallow') }}<br>
                   </div>
                   <div class="inputcontent">
-                  <input v-model='userData.hosts' type="text" name="hosts" class="form-control">
+                  <input v-model='hosts' type="text" name="hosts" class="form-control">
                   </div>
                   </div>
                 </div>
@@ -53,11 +55,11 @@
                   <label class="control-label" for="iface_allow">{{ $t('users.interface') }}</label>
                   <div class="contentt">
                   <div class="optionn">
-                  <input type="radio" name="iface_allow" v-model="userData.iface_allow_number" value="0" checked>{{ $t('users.allowanddeny') }}<br>
-                  <input type="radio" name="iface_allow" v-model="userData.iface_allow_number" value="1" style="margin-left: 20px" >{{ $t('users.denyandallow') }}<br>
+                  <input type="radio" name="iface_allow" v-model="iface_allow_number" value="0" checked>{{ $t('users.allowanddeny') }}<br>
+                  <input type="radio" name="iface_allow" v-model="iface_allow_number" value="1" style="margin-left: 20px" >{{ $t('users.denyandallow') }}<br>
                   </div>
                   <div class="inputcontent">
-                  <input v-model='userData.ifaces' type="text" name="ifaces" class="form-control">
+                  <input v-model='ifaces' type="text" name="ifaces" class="form-control">
                   </div>
                   </div>
                 </div>
@@ -79,16 +81,15 @@
     props: ['userData'],
     data() {
       return {
-        // name: this.userData,
-        // comment: '',
-        // password: '',
-        // // comfirm_password: '',
-        // role: '',
-        // host_allow: '',
-        // hosts: [],
-        // iface_allow: '',
-        // ifaces: [],
-        // roles: [],
+        name: '',
+        comment: '',
+        password: '',
+        role_id: '',
+        host_allow_number: '',
+        hosts: [],
+        iface_allow_number: '',
+        ifaces: [],
+        roles: [],
         message: ''
       }
     },
@@ -105,6 +106,9 @@
       })
     },
     methods: {
+      getName() {
+        return this.userData.name
+      },
       updateUser(id) {
         this.$validator.validateAll().then(res => {
           if (res) {
@@ -112,14 +116,14 @@
               method: 'put',
               url: 'http://localhost:8081/user/' + id,
               data: {
-                name: this.userData.name,
-                comment: this.userData.comment,
-                password: this.userData.password,
-                role_id: this.userData.role_id,
-                host_allow_number: this.userData.host_allow_number,
-                hosts: this.userData.hosts,
-                iface_allow_number: this.userData.iface_allow_number,
-                ifaces: this.userData.ifaces
+                name: this.name,
+                comment: this.comment,
+                password: this.password,
+                role_id: this.role_id,
+                host_allow_number: this.host_allow_number,
+                hosts: this.hosts,
+                iface_allow_number: this.iface_allow_number,
+                ifaces: this.ifaces
               }
             })
             .then(response => {
@@ -132,6 +136,11 @@
         })
       }
     }
+    // computed: {
+    //   getName() {
+    //     return this.userData.name
+    //   }
+    // }
   }
 </script>
 <style>

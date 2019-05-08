@@ -55,12 +55,11 @@
                 <input type="radio" name="reverse-unify" v-model="targetData.rlunify" value=1>Có<br>
                 <input type="radio" name="reverse-unify" v-model="targetData.rlunify" value=0  style="margin-left: 30px;" checked>Không<br>
               </div>
-              <button type="submit" class="btn btn-primary button-save">Lưu</button>
             </form>
           </div>
           <!-- <div>{{targetData.id}}</div> -->
           <div class="modal-footer">
-              
+             <button type="submit" @click="updateTarget()" class="btn btn-primary button-save">Lưu</button>
           </div>
         </div>
       </div>
@@ -136,8 +135,8 @@
 #updateTarget label {
     min-width: 125px;
 }
-.modal-open .modal {
+/* .modal-open .modal {
     overflow-x: hidden; 
     overflow-y: hidden;
-}
+} */
 </style>

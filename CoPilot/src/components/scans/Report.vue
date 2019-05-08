@@ -29,7 +29,7 @@
                       </tr>
                       <tr>
                         <th>IP</th>
-                        <th class="report-hostname" style="border-right-width: thin;">Name</th>
+                        <th class="report-hostname" style="border-right-width: thin;">Tên</th>
                       </tr>
                     </thead>
                     <tbody>

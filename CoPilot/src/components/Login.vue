@@ -49,8 +49,10 @@ export default {
         }
       })
       .then(response => {
-        if (response.data === 'Login successful') {
+        if (response.data.message === 'Login successful') {
           let name = this.name
+          let id = response.data.id
+          window.localStorage.setItem('id', id)
           window.localStorage.setItem('name', name)
           this.$router.push('/')
         } else {

@@ -20,11 +20,11 @@
                   <label class="control-label" for="comment">{{ $t('commentMsg') }}</label>
                   <input class="form-control" v-model="comment" name="comment" type="text">
                 </div>
-                <button type="submit" class="btn btn-primary" >Lưu</button>
+                
               </form>
           </div>
           <div class="modal-footer">
-              
+              <button type="submit" @click="createHost()" class="btn btn-primary" >Lưu</button>
           </div>
         </div>
       </div>
@@ -51,7 +51,8 @@
               url: 'http://localhost:8081/host',
               data: {
                 name: this.name,
-                comment: this.comment
+                comment: this.comment,
+                owner: localStorage.getItem('id')
               }
             })
             .then(response => {

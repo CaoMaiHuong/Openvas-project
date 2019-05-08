@@ -91,6 +91,7 @@ type User struct {
 	Id                 int    `json:"id"`
 	Uuid               string `json:"uuid"`
 	Name               string `json:"name"`
+	Owner string `json:"owner"`
 	Comment            string `json:"comment"`
 	Role               string `json:"role"`
 	RoleId             string `json:"role_id"`
@@ -103,6 +104,7 @@ type User struct {
 	Ifaces             string `json:"ifaces"`
 	Created            string `json:"created"`
 	Modified           string `json:"modified"`
+	Message            string `json:"message"`
 }
 
 type Target_Task struct {
@@ -130,12 +132,14 @@ type Target struct {
 	Modified      string        `json:"modified"`
 	AliveTest     string        `json:"alivetest"`
 	Task          []Target_Task `json:"task"`
+	Owner         string        `json:"owner"`
 }
 
 type Task struct {
 	Id           int            `json:"id"`
 	Uuid         string         `json:"uuid"`
 	Name         string         `json:"name"`
+	Owner string `json:"owner"`
 	Status       string         `json:"status"`
 	ReportNumber sql.NullString `json:"rpnumber"`
 	// Reports      string         `json:"report"`
@@ -306,9 +310,10 @@ type Host struct {
 	Hostname   sql.NullString `json:"hostname"`
 	IpAddress  sql.NullString `json:"ipaddress"`
 	Severity   sql.NullString `json:"severity"`
-	Created   string         `json:"created"`
+	Created    string         `json:"created"`
 	Modified   string         `json:"modified"`
 	Identifier []Identifiers  `json:"identifier"`
+	Owner string `json:"owner"`
 }
 
 type Paginator struct {
@@ -419,7 +424,7 @@ func allTargets(w http.ResponseWriter, r *http.Request) {
 	page, err := strconv.Atoi(vars["page"])
 
 	var offset int
-	limit := 10
+	limit := 8
 	if page == 1 {
 		offset = 0
 	} else {
@@ -533,11 +538,15 @@ func getTarget(w http.ResponseWriter, r *http.Request) {
 func createTarget(w http.ResponseWriter, r *http.Request) {
 	var target Target
 	_ = json.NewDecoder(r.Body).Decode(&target)
+	owner, err := strconv.Atoi(target.Owner)
+	if err != nil {
+		fmt.Println("Error")
+	}
 	var u = uuid.Must(uuid.NewV4())
 	var created = time.Now().Unix()
 	var modified = time.Now().Unix()
-
-	db.Exec("INSERT INTO targets(uuid,name, hosts, reverse_lookup_only, reverse_lookup_unify, comment, port_list, alive_test, creation_time, modification_time) VALUES (?,?,?,?,?,?,?,?,?,?)", &u, &target.Name, &target.Hosts, &target.RLOnly, &target.RLUnify, &target.Comment, &target.PortList, &target.AliveTest, &created, &modified)
+	fmt.Println(target)
+	db.Exec("INSERT INTO targets(uuid,name,owner, hosts, reverse_lookup_only, reverse_lookup_unify, comment, port_list, alive_test, creation_time, modification_time) VALUES (?,?,(select id from users where id = ?),?,?,?,?,?,?,?,?)", &u, &target.Name, &owner, &target.Hosts, &target.RLOnly, &target.RLUnify, &target.Comment, &target.PortList, &target.AliveTest, &created, &modified)
 }
 
 func updateTarget(w http.ResponseWriter, r *http.Request) {
@@ -645,7 +654,7 @@ func allTasks(w http.ResponseWriter, r *http.Request) {
 	page, err := strconv.Atoi(vars["page"])
 
 	var offset int
-	limit := 10
+	limit := 8
 	if page == 1 {
 		offset = 0
 	} else {
@@ -719,11 +728,15 @@ func allTasks(w http.ResponseWriter, r *http.Request) {
 func createTask(w http.ResponseWriter, r *http.Request) {
 	var task Task
 	_ = json.NewDecoder(r.Body).Decode(&task)
+	owner, err := strconv.Atoi(task.Owner)
+	if err != nil {
+		fmt.Println("Error")
+	}
 	var u = uuid.Must(uuid.NewV4())
 	var created = time.Now().Unix()
 	var modified = time.Now().Unix()
 
-	db.Exec("with task as (insert into tasks(uuid, name, comment, hidden, run_status, config, target, scanner, hosts_ordering, alterable, creation_time, modification_time) values (?,?,?,?,?,?,?,?,?,?,?,?) returning id) insert into task_preferences(task, name, value) values ((select id from task), 'max_checks', ?),((select id from task), 'max_hosts', ?),((select id from task), 'in_assets', ?),((select id from task), 'assets_apply_overrides', ?),((select id from task), 'assets_min_qod', ?),((select id from task), 'auto_delete', ?),((select id from task), 'auto_delete_data', ?)", &u, &task.Name, &task.Comment, 0, 2, &task.Config, &task.Target, &task.Scanner, &task.Hosts_ordering, &task.Alterable, &created, &modified, &task.Max_checks, &task.Max_hosts, &task.In_assets, &task.Assets_apply_overrides, &task.Assets_min_qod, &task.Auto_delete, &task.Auto_delete_data)
+	db.Exec("with task as (insert into tasks(uuid, name, owner, comment, hidden, run_status, config, target, scanner, hosts_ordering, alterable, creation_time, modification_time) values (?,?,(select id from users where id=?),?,?,?,?,?,?,?,?,?,?) returning id) insert into task_preferences(task, name, value) values ((select id from task), 'max_checks', ?),((select id from task), 'max_hosts', ?),((select id from task), 'in_assets', ?),((select id from task), 'assets_apply_overrides', ?),((select id from task), 'assets_min_qod', ?),((select id from task), 'auto_delete', ?),((select id from task), 'auto_delete_data', ?)", &u, &task.Name, owner, &task.Comment, 0, 2, &task.Config, &task.Target, &task.Scanner, &task.Hosts_ordering, &task.Alterable, &created, &modified, &task.Max_checks, &task.Max_hosts, &task.In_assets, &task.Assets_apply_overrides, &task.Assets_min_qod, &task.Auto_delete, &task.Auto_delete_data)
 }
 
 func updateTask(w http.ResponseWriter, r *http.Request) {
@@ -853,7 +866,7 @@ func getReport(w http.ResponseWriter, r *http.Request) {
 	var ip string
 	var name string
 	var offset int
-	limit := 10
+	limit := 6
 	if page == 1 {
 		offset = 0
 	} else {
@@ -1002,7 +1015,7 @@ func searchNvts(w http.ResponseWriter, r *http.Request) {
 	row := db.Raw("Select count(*) from nvts WHERE Lower(name) LIKE '%'  || lower(?) || '%'", search).Row() // (*sql.Row)
 	row.Scan(&count)
 	paginator := Paging(page, limit, offset, count, &nvts)
-	json.NewEncoder(w).Encode(paginator)	
+	json.NewEncoder(w).Encode(paginator)
 }
 
 func getNvt(w http.ResponseWriter, r *http.Request) {
@@ -1330,7 +1343,7 @@ func allCpes(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	page, err := strconv.Atoi(vars["page"])
 	var offset int
-	limit := 10
+	limit := 7
 	if page == 1 {
 		offset = 0
 	} else {
@@ -1436,7 +1449,7 @@ func allHosts(w http.ResponseWriter, r *http.Request) {
 	page, err := strconv.Atoi(vars["page"])
 
 	var offset int
-	limit := 5
+	limit := 8
 	if page == 1 {
 		offset = 0
 	} else {
@@ -1458,6 +1471,9 @@ func allHosts(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 		host.Modified = time.Unix(i, 0).Format(time.RFC850)
+		if host.Severity.Valid == false {
+			host.Severity.String = "N/A"
+		}
 		if host.Hostname.Valid == false {
 			host.Hostname.String = ""
 		}
@@ -1544,11 +1560,15 @@ func getHost(w http.ResponseWriter, r *http.Request) {
 func createHost(w http.ResponseWriter, r *http.Request) {
 	var host Host
 	_ = json.NewDecoder(r.Body).Decode(&host)
+	owner, err := strconv.Atoi(host.Owner)
+	if err != nil {
+		fmt.Println("Error")
+	}
 	var u = uuid.Must(uuid.NewV4())
 	var created = time.Now().Unix()
 	var modified = time.Now().Unix()
 
-	db.Exec("INSERT INTO hosts(uuid, name, comment, creation_time, modification_time) VALUES (?,?,?,?,?)", &u, &host.Name, &host.Comment, &created, &modified)
+	db.Exec("INSERT INTO hosts(uuid, name, owner, comment, creation_time, modification_time) VALUES (?,?,(select id from users where id = ?),?,?,?)", &u, &host.Name, &owner, &host.Comment, &created, &modified)
 	// if err != nil {
 	// 	log.Print(err)
 	// 	return
@@ -1616,24 +1636,25 @@ func login(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(user.Password)
 	// password, err := bcrypt.GenerateFromPassword([]byte(user.Password), 8)
 	// pass := string(password)
-	rows, err := db.Raw("SELECT name, count(*) FROM Users WHERE name = ? AND password = ? GROUP BY name", &user.Name, &user.Password).Rows() // (*sql.Rows, error)
+	rows, err := db.Raw("SELECT id, name, count(*) FROM Users WHERE name = ? AND password = ? GROUP BY id,name", &user.Name, &user.Password).Rows() // (*sql.Rows, error)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
 	var count int
 	for rows.Next() {
-		rows.Scan(&user.Name, &count)
+		rows.Scan(&user.Id, &user.Name, &count)
 	}
 	if count > 0 {
 		// session.Values["id"] = &user.Id
 		session.Values["username"] = &user.Name
 		session.Save(r, w)
-		fmt.Fprintf(w, "Login successful")
+		user.Message = "Login successful"
 
 	} else {
 		fmt.Fprintf(w, "Email or Password incorrect")
 	}
+	json.NewEncoder(w).Encode(user)
 }
 
 func allUser(w http.ResponseWriter, r *http.Request) {
@@ -1719,6 +1740,10 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&user)
 	// user = append(user, person)
 	// json.NewEncoder(w).Encode(user)
+	owner, err := strconv.Atoi(user.Owner)
+	if err != nil {
+		fmt.Println("Error")
+	}
 	rows, err := db.Raw("SELECT count(*) FROM users WHERE name = ?", &user.Name).Rows() // (*sql.Rows, error)
 	if err != nil {
 		log.Fatal(err)
@@ -1750,7 +1775,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		}
 		// db.Exec("INSERT INTO users(uuid, name, comment, password, hosts, hosts_allow, ifaces, ifaces_allow, creation_time, modification_time) VALUES (?,?,?,?,?,?,?,?,?,?)", &u, &user.Name, &user.Comment, &user.Password, &user.Hosts, &Host_allow, &user.Ifaces, &Iface_allow, &created, &modified)
 		// db.Exec("INSERT INTO role_users(role, user) VALUES(?,SELECT id FROM users WHERE name = ?)", &role, &user.Name)
-		db.Exec("with userr as (insert into users(uuid, name, comment, password, hosts, hosts_allow, ifaces, ifaces_allow, creation_time, modification_time) values (?,?,?,?,?,?,?,?,?,?) returning id) insert into role_users(role, \"user\") values ( ?, (select id from userr))", &u, &user.Name, &user.Comment, &user.Password, &user.Hosts, &Host_allow, &user.Ifaces, &Iface_allow, &created, &modified, &role)
+		db.Exec("with userr as (insert into users(uuid, name, owner, comment, password, hosts, hosts_allow, ifaces, ifaces_allow, creation_time, modification_time) values (?,?,?,?,?,?,?,?,?,?,?) returning id) insert into role_users(role, \"user\") values ( ?, (select id from userr))", &u, &user.Name, owner, &user.Comment, &user.Password, &user.Hosts, &Host_allow, &user.Ifaces, &Iface_allow, &created, &modified, &role)
 	}
 
 }
@@ -1816,14 +1841,14 @@ func main() {
 	myRouter.HandleFunc("/dashboard", getDashboard).Methods("GET")
 	myRouter.HandleFunc("/cvebyseverity", cveBySeverity).Methods("GET")
 	myRouter.HandleFunc("/nvtbyseverity", nvtBySeverity).Methods("GET")
-	
+
 	// Users
 	myRouter.HandleFunc("/users/page/{page}", allUser).Methods("GET")
 	myRouter.HandleFunc("/roles", getRoles).Methods("GET")
 	myRouter.HandleFunc("/user/{id}", deleteUser).Methods("DELETE")
 	myRouter.HandleFunc("/user/{id}", updateUser).Methods("PUT")
 	myRouter.HandleFunc("/user", createUser).Methods("POST")
-	
+
 	// Tasks
 	myRouter.HandleFunc("/tasks/page/{page}", allTasks).Methods("GET")
 	myRouter.HandleFunc("/task", createTask).Methods("POST")
@@ -1834,29 +1859,29 @@ func main() {
 	myRouter.HandleFunc("/configs", allConfig).Methods("GET")
 	myRouter.HandleFunc("/reports/{uuid}/page/{page}", reportByTask).Methods("GET")
 	myRouter.HandleFunc("/report/{uuid}/page/{page}", getReport).Methods("GET")
-	
+
 	// Targets
 	myRouter.HandleFunc("/targets/page/{page}", allTargets).Methods("GET")
 	myRouter.HandleFunc("/target/{id}", getTarget).Methods("GET")
 	myRouter.HandleFunc("/target", createTarget).Methods("POST")
 	myRouter.HandleFunc("/target/{id}", updateTarget).Methods("PUT")
 	myRouter.HandleFunc("/target/{id}", deleteTarget).Methods("DELETE")
-	
+
 	//Nvts
 	myRouter.HandleFunc("/nvts/page/{page}", allNvts).Methods("GET")
 	myRouter.HandleFunc("/nvt/{id}", getNvt).Methods("GET")
 	myRouter.HandleFunc("/nvts/page/{page}/search/{search}", searchNvts).Methods("GET")
-	
+
 	// Cves
 	myRouter.HandleFunc("/cves/page/{page}", allCves).Methods("GET")
 	myRouter.HandleFunc("/cve/{name}", getCve).Methods("GET")
 	myRouter.HandleFunc("/cves/page/{page}/search/{search}", searchCves).Methods("GET")
-	
+
 	// Cpes
 	myRouter.HandleFunc("/cpes/page/{page}", allCpes).Methods("GET")
 	myRouter.HandleFunc("/cpe/{id}", getCpe).Methods("GET")
 	myRouter.HandleFunc("/cpes/page/{page}/search/{search}", searchCpes).Methods("GET")
-	
+
 	// Hosts
 	myRouter.HandleFunc("/hosts/page/{page}", allHosts).Methods("GET")
 	myRouter.HandleFunc("/host/{id}", getHost).Methods("GET")

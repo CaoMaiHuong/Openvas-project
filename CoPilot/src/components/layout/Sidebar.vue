@@ -80,5 +80,7 @@ export default {
 #search-btn {
   width: 20%;
 }
-
+.main-sidebar {
+  font-size: 16px;
+}
 </style>

@@ -1,7 +1,7 @@
 <template>
   <footer class="main-footer">
     <strong>Copyright &copy; {{ year }}
-    <a href="javascript:;">CoPilot</a>.</strong> All rights reserved.
+    <a href="javascript:;">Cmhuong</a></strong>
   </footer>
 </template>
 

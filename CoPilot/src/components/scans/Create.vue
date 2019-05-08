@@ -4,7 +4,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <span class="modal-header__title">
-              Tạo mới task
+              Tạo mới tác vụ
             </span>
             <button type="button" class="close" data-dismiss="modal">&times;</button>  
           </div>
@@ -18,7 +18,7 @@
                 <div class="form-group">
                   <label class="control-label" for="comment">{{ $t('commentMsg') }}</label>
                   <input v-model='comment' class="form-control" name='comment'>
-                </div>
+                </div> 
                 <div class="form-group">
                   <label class="control-label" for='target'>{{ $t('tasks.scanTarget') }}</label>
                   <select onfocus='this.size=10;' onblur='this.size=1;' onchange='this.size=1; this.blur();' name="target" class="form-control"  v-model="target">
@@ -26,13 +26,13 @@
                   </select>
                   <span v-if="errors.has('target')">{{ errors.first('target') }}</span>
                 </div>
-                <div class="form-group">
+                <div class="form-group alertt">
                   <label class="control-label" for="alert">{{ $t('tasks.alert') }}</label>
                   <select class="form-control" v-model="alert">
-                    <option value>Please select one</option>
+                    <option></option>
                   </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group schedule">
                   <label class="control-label" for='schedule'>{{ $t('tasks.schedule') }}</label>
                   <select class="form-control" v-model="schedule">
                     <option></option>
@@ -63,23 +63,23 @@
                   <input type="radio" onclick="document.getElementById('del_data').disabled = false;" name="auto_delete" v-model="auto_delete" value="keep">{{ $t('tasks.delReport.delReport2') }}&nbsp;
                   <input type="number" class="delete-data" id="del_data" v-model="auto_delete_data" disabled>&nbsp;báo cáo mới nhất<br>
                 </div>
-                <div class="form-group">
+                <div class="form-group scanner">
                   <label class="control-label" for='scanner'>{{ $t('tasks.scanner') }}</label>
                   <select class="form-control" v-model="scanner">
                     <option v-for="s in scanners" :key="s.id" v-bind:value=s.id>{{s.name}}</option>
                   </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group config">
                   <label class="control-label" for='config'>{{ $t('tasks.scanConfig') }}</label>
                   <select class="form-control" v-model="config">
                     <option v-for="c in configs" :key="c.id" v-bind:value=c.id>{{c.name}}</option>
                   </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group network">
                   <label class="control-label" for='network'>{{ $t('tasks.networkInterface') }}</label>
                   <input type="text" class="form-control" v-model="network" name="network">
-                </div>
-                <div class="form-group">
+                </div> 
+                <div class="form-group hosts_ordering" >
                   <label class="control-label" for='hosts_ordering'>{{ $t('tasks.orderTarget') }}</label>
                   <select class="form-control" v-model="hosts_ordering">
                     <option value="sequential">Sequential</option>
@@ -185,7 +185,8 @@
                 network: this.network,
                 hosts_ordering: this.hosts_ordering,
                 max_checks: this.max_checks,
-                max_hosts: this.max_hosts
+                max_hosts: this.max_hosts,
+                owner: localStorage.getItem('id')
               }
             })
             .then(response => {
@@ -221,8 +222,8 @@
     display: flex;
     align-items: center;
   }
-   .assets_min_qod label{
-     width: 90px;
+  .hosts_ordering label, .network label, .config label, .schedule label, .alertt label, .scanner label, .assets_min_qod label{
+     width: 100%;
    }
   .delete-data{
     width: 50px;
@@ -241,5 +242,8 @@
   }
   .modal-submit {
     margin-right: 20px;
+  }
+  .hosts_ordering, .network, .config, .scanner, .schedule, .alertt{
+    display: flex;
   }
 </style>

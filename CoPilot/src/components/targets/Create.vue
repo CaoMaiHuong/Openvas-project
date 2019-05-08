@@ -56,10 +56,12 @@
                   <input type="radio" name="reverse-unify" v-model="rlunify" value=1>Có<br>
                   <input type="radio" name="reverse-unify" v-model="rlunify" value=0 checked style="margin-left: 30px;">Không<br>
                 </div>
-                <button type="submit" class="btn btn-primary button-save">Lưu</button>
+                
               </form>
           </div>
-          
+          <div class="modal-footer">
+           <button type="submit" @click="createTarget()" class="btn btn-primary button-save">Lưu</button>
+          </div>
         </div>
       </div>
     </div>
@@ -99,6 +101,7 @@
               method: 'post',
               url: 'http://localhost:8081/target',
               data: {
+                owner: localStorage.getItem('id'),
                 name: this.name,
                 comment: this.comment,
                 hosts: this.hosts,
@@ -123,9 +126,7 @@
   display: flex;
   align-items: center;
 } */
-.button-save{
-  margin-top: 30px;
-}
+
 
 .create-target .form-group{
     display: flex;
