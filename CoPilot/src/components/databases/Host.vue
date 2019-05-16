@@ -16,10 +16,10 @@
                       <tr role="row">
                         <th style="width: 10%" aria-sort="ascending" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('hosts.nameMsg') }}</th> 
                         <th style="width: 13%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('hosts.hostnameMsg') }}</th>
-                        <th style="width: 13%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('hosts.ipMsg') }}</th>
+                        <th style="width: 7%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('hosts.ipMsg') }}</th>
                         <th style="width: 6%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('severityMsg') }}</th>
                         <th style="width: 15%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0">{{ $t('modifyMsg') }}</th>
-                        <th style="width: 9%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('action.nameMsg') }}</th>
+                        <th style="width: 12%" colspan="1" rowspan="1" aria-controls="example1" tabindex="0" >{{ $t('action.nameMsg') }}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -104,7 +104,7 @@ export default {
       this.modalData = item
     },
     deleteHost(index, id) {
-      if (confirm('Do you really want to delete it?')) {
+      if (confirm('Bạn có chắc chắn muốn xóa?')) {
         axios.delete('http://localhost:8081/host/' + id)
         .then(response => {
           this.hosts.splice(index, 1)
@@ -164,5 +164,8 @@ table.dataTable thead .sorting_desc:after {
 }
 .pagination span{
   margin: 0px 10px
+}
+a:hover {
+  cursor: pointer;
 }
 </style>

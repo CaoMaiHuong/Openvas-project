@@ -35,7 +35,7 @@
                     <tbody>
                       <tr class="odd" role="row" v-for="report in reports" :key="report.id">
                         <!-- <td class="sorting_1">{{user.ID}}</td> -->
-                        <td><router-link :to="{ name: 'Báo cáo', params: {id: report.uuid}}">{{report.date}}</router-link></td>
+                        <td><router-link :to="{ name: 'Báo cáo', params: {id: report.uuid, date:report.date}}">{{report.date}}</router-link></td>
                         <td>{{report.status}}</td>
                         <td>{{report.task}}</td>
                         <td>{{report.severity.String}}</td>
@@ -58,7 +58,7 @@
                   <div class="pagination">
                     <button class="btn btn-primary" v-on:click="fetchPaginate(1)" :disabled="pagination.page == 1"><i class="fa fa-angle-double-left"></i></button>
                     <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.prev_page)" :disabled="pagination.page == 1"><i class="fa fa-angle-left"></i></button>
-                    <span>Page {{ pagination.page }} of {{ pagination.total_page }} </span>
+                    <span>Trang {{ pagination.page }} / {{ pagination.total_page }} </span>
                     <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.next_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-right"></i></button>
                     <button class="btn btn-primary" v-on:click="fetchPaginate(pagination.total_page)" :disabled="pagination.page == pagination.total_page"><i class="fa fa-angle-double-right"></i></button>
                   </div>

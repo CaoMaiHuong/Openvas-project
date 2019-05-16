@@ -24,6 +24,10 @@
               </div>
               <div v-if="message" class="not-found">
                 {{message}}
+                <div>
+                  <br>
+                  <button @click="returnList" class="btn btn-primary">Xem danh sách CVE</button>
+                </div>
               </div>
               <div class="row" v-if="!message">  
                 <div class="col-sm-12 table-responsive">
@@ -147,6 +151,12 @@ export default {
           this.getCve(this.page)
         }
       })
+    },
+    returnList() {
+      this.message = ''
+      this.getCve(this.page)
+      this.search = ''
+      this.searching = false
     },
     makePagination(data) {
       let pagination = {

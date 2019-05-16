@@ -15,9 +15,9 @@
         <span style="color:red"> {{ message }}</span>
         <br>
         <button type="submit" v-bind:class="'btn btn-primary btn-lg'">Đăng nhập</button>
-        <div class="signup">Bạn chưa có tài khoản?
+        <!-- <div class="signup">Bạn chưa có tài khoản?
           <router-link to="/signup">Đăng ký</router-link>
-        </div>
+        </div> -->
       </form>
 
       <!-- errors -->

@@ -1,33 +1,30 @@
 <template>
-  <div>
+  <div v-if="renderComponent">
     <div id="updateModal" class="modal fade" role="dialog">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
             <span class="modal-header__title">
-              Sửa đổi thông tin người dùng
+              Tạo mới người dùng
             </span>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>  
+            <button type="button" @click="closeForm()" class="close" data-dismiss="modal">&times;</button>  
           </div>
           <div class="modal-body">   
               <form v-on:submit.prevent="updateUser(userData.id)" class="create-user" style="padding: 0px">
-                <!--{{userData}} -->
-                {{getName}}
                 <div class="form-group">
                   <label class="control-label" for="name">{{ $t('users.nameMsg') }}</label>
-                  <input class="form-control" v-model="getName" name="name" v-validate="'required'" type="text">
+                  <input class="form-control" v-model="userData.name" name="name" v-validate="'required'" type="text">
                   <span v-if="errors.has('name')">{{ errors.first('name') }}</span>
-                  <span v-if="message">{{message}}</span>
                 </div>
                 <div class="form-group">
                   <label class="control-label" for="comment">{{ $t('commentMsg') }}</label>
-                  <input class="form-control" v-model="comment" name="comment" type="text">
+                  <input class="form-control" v-model="userData.comment" name="comment" type="text">
                 </div>
-                <div class="form-group">
+                <!-- <div class="form-group">
                   <label class="control-label" for='password'>{{ $t('users.passwordMsg') }}</label>
-                  <input v-validate="'required|min:6'" v-model='password' name="password" type="password" class="form-control" ref="password">
+                  <input v-validate="'required|min:6'" v-model='userData.password' name="password" type="password" class="form-control" ref="password">
                   <span v-if="errors.has('password')">{{ errors.first('password') }}</span>
-                </div>
+                </div> -->
                 <!-- <div class="form-group">
                   <label class="control-label" for="confirm_password">{{ $t('users.confirmPassword') }}</label>
                   <input v-model='confirm_password' name="confirm_password" v-validate="'required|confirmed:password'" type="password" class="form-control" data-vv-as="password">
@@ -35,7 +32,7 @@
                 </div> -->
                 <div class="form-group">
                   <label for='role'>{{ $t('users.roleMsg') }}</label>
-                  <select class="form-control" v-model="role_id">
+                  <select class="form-control" v-model="userData.role_id">
                     <option v-for="r in roles" :key="r.id" v-bind:value="r.id">{{r.name}}</option>
                   </select>
                 </div>
@@ -43,11 +40,11 @@
                   <label class="control-label" for="host_allow">{{ $t('users.hostAccessMsg') }}</label>
                   <div class="contentt">
                   <div class="optionn">
-                  <input type="radio" name="host_allow" v-model="host_allow_number" value="0" checked>{{ $t('users.allowanddeny') }}<br>
-                  <input type="radio" name="host_allow" v-model="host_allow_number" value="1" style="margin-left: 20px">{{ $t('users.denyandallow') }}<br>
+                  <input type="radio" name="host_allow" v-model="userData.host_allow_number" value="0" checked>{{ $t('users.allowanddeny') }}<br>
+                  <input type="radio" name="host_allow" v-model="userData.host_allow_number" value="1" style="margin-left: 20px">{{ $t('users.denyandallow') }}<br>
                   </div>
                   <div class="inputcontent">
-                  <input v-model='hosts' type="text" name="hosts" class="form-control">
+                  <input v-model='userData.hosts' type="text" name="hosts" class="form-control">
                   </div>
                   </div>
                 </div>
@@ -55,19 +52,22 @@
                   <label class="control-label" for="iface_allow">{{ $t('users.interface') }}</label>
                   <div class="contentt">
                   <div class="optionn">
-                  <input type="radio" name="iface_allow" v-model="iface_allow_number" value="0" checked>{{ $t('users.allowanddeny') }}<br>
-                  <input type="radio" name="iface_allow" v-model="iface_allow_number" value="1" style="margin-left: 20px" >{{ $t('users.denyandallow') }}<br>
+                  <input type="radio" name="iface_allow" v-model="userData.iface_allow_number" value="0" checked>{{ $t('users.allowanddeny') }}<br>
+                  <input type="radio" name="iface_allow" v-model="userData.iface_allow_number" value="1" style="margin-left: 20px" >{{ $t('users.denyandallow') }}<br>
                   </div>
                   <div class="inputcontent">
-                  <input v-model='ifaces' type="text" name="ifaces" class="form-control">
+                  <input v-model='userData.ifaces' type="text" name="ifaces" class="form-control">
                   </div>
                   </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Lưu</button>
               </form>
           </div>
           <div class="modal-footer">
-              
+            <!-- <button class="btn btn-danger" v-if="message">{{message}}</button> -->
+            <button class="btn btn-success" v-if="messageUpdate">{{messageUpdate}}</button>
+            <button type="submit" @click="updateUser(userData.id)" class="btn btn-primary">Lưu</button>
+            <!-- <span v-if="message">{{message}}</span>
+            <span v-if="messageUpdate">{{messageUpdate}}</span> -->
           </div>
         </div>
       </div>
@@ -81,16 +81,19 @@
     props: ['userData'],
     data() {
       return {
-        name: '',
-        comment: '',
-        password: '',
-        role_id: '',
-        host_allow_number: '',
-        hosts: [],
-        iface_allow_number: '',
-        ifaces: [],
+        // name: this.userData,
+        // comment: '',
+        // password: '',
+        // // comfirm_password: '',
+        // role: '',
+        // host_allow: '',
+        // hosts: [],
+        // iface_allow: '',
+        // ifaces: [],
         roles: [],
-        message: ''
+        // message: '',
+        messageUpdate: '',
+        renderComponent: true
       }
     },
     created() {
@@ -106,9 +109,6 @@
       })
     },
     methods: {
-      getName() {
-        return this.userData.name
-      },
       updateUser(id) {
         this.$validator.validateAll().then(res => {
           if (res) {
@@ -116,31 +116,37 @@
               method: 'put',
               url: 'http://localhost:8081/user/' + id,
               data: {
-                name: this.name,
-                comment: this.comment,
-                password: this.password,
-                role_id: this.role_id,
-                host_allow_number: this.host_allow_number,
-                hosts: this.hosts,
-                iface_allow_number: this.iface_allow_number,
-                ifaces: this.ifaces
+                name: this.userData.name,
+                comment: this.userData.comment,
+                // password: this.userData.password,
+                role_id: this.userData.role_id,
+                host_allow_number: this.userData.host_allow_number,
+                hosts: this.userData.hosts,
+                iface_allow_number: this.userData.iface_allow_number,
+                ifaces: this.userData.ifaces
               }
             })
             .then(response => {
-              this.message = response.data
+              if (response.data === 'Tên người dùng đã tồn tại!') {
+                this.message = response.data
+              }
+              if (response.data === 'Cập nhật thông tin thành công!') {
+                this.messageUpdate = response.data
+                this.message = ''
+                location.reload()
+              }
               // if (this.message !== 'User already exists') {
               //   this.$router.push('/users')
               // }
             })
           }
         })
+      },
+      closeForm() {
+        this.message = ''
+        this.messageUpdate = ''
       }
     }
-    // computed: {
-    //   getName() {
-    //     return this.userData.name
-    //   }
-    // }
   }
 </script>
 <style>

@@ -6,7 +6,7 @@
             <span class="modal-header__title">
               Tạo mới tác vụ
             </span>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>  
+            <button type="button" class="close" data-dismiss="modal" @click="closeForm()">&times;</button>  
           </div>
           <div class="modal-body">   
               <form v-on:submit.prevent="createTask" class="create-user" style="padding: 0px">
@@ -99,6 +99,8 @@
               </form>
           </div>
           <div class="modal-footer">
+            <button type="submit" @click="closeForm()" data-dismiss="modal" class="btn btn-default" style="float:left">Đóng</button>
+            <button class="btn btn-success" v-if="messageCreate">{{messageCreate}}</button>
             <button type="submit"  @click="createTask()" class="btn btn-primary modal-submit" >Lưu</button>
           </div>
         </div>
@@ -131,7 +133,8 @@
         network: '',
         hosts_ordering: 'sequential',
         max_checks: '4',
-        max_hosts: '20'
+        max_hosts: '20',
+        messageCreate: ''
       }
     },
     created() {
@@ -190,11 +193,16 @@
               }
             })
             .then(response => {
-              // // this.$router.push('/targets')
-              // this.$router.go(0)
+              if (response.data === 'Tạo tác vụ thành công!') {
+                this.messageCreate = response.data
+                location.reload()
+              }
             })
           }
         })
+      },
+      closeForm() {
+        this.messageCreate = ''
       }
     }
   }

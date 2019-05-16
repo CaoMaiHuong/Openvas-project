@@ -12,9 +12,6 @@ import (
 	"strings"
 	"time"
 
-	// "golang.org/x/crypto/bcrypt"
-
-	// "github.com/biezhi/gorm-paginator/pagination"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -26,45 +23,7 @@ import (
 
 var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
 
-func initialMigration() {
-	//open a db connection
-	// var err error
-	// db, err := gorm.Open("postgres", "root:@/gomanagement?charset=utf8&parseTime=True&loc=Local")
-	db, err := gorm.Open("postgres", "user=postgres dbname=mydb password=19121997 sslmode=disable")
-	db = db.Set("gorm:table_options", "ENGINE=InnoDB CHARSET=utf8 auto_increment=1")
-	if err != nil {
-		panic("failed to connect database")
-	}
-	//Migrate the schema
-	db.AutoMigrate(&userModel{})
-}
-
 var db *gorm.DB
-
-// func main() {
-// 	fmt.Println("cat")
-// 	router := gin.Default()
-// 	router.GET("/", allUser)
-// 	router.POST("/", createUser)
-// 	// router.PUT("/:id", updateUser)
-// 	// router.DELETE("/:id", deleteUser)
-// 	router.Run(":3000")
-// }
-
-type userModel struct {
-	gorm.Model
-	// Id      string `json:"id"`
-	Name     string `json:"name" gorm:"not null"`
-	Email    string `json:"email" gorm:"not null;unique"`
-	Password string `json:"password" gorm:"not null"`
-	Dob      string `json:"dob" gorm:"not null"`
-	Phone    string `json:"phone" gorm:"not null"`
-	Level    string `json:"level" gorm:"default:'User'"`
-}
-type loginn struct {
-	email    string
-	password string
-}
 
 type Dashboard struct {
 	UserNumber string `json:"userNumber"`
@@ -91,7 +50,7 @@ type User struct {
 	Id                 int    `json:"id"`
 	Uuid               string `json:"uuid"`
 	Name               string `json:"name"`
-	Owner string `json:"owner"`
+	Owner              string `json:"owner"`
 	Comment            string `json:"comment"`
 	Role               string `json:"role"`
 	RoleId             string `json:"role_id"`
@@ -139,7 +98,7 @@ type Task struct {
 	Id           int            `json:"id"`
 	Uuid         string         `json:"uuid"`
 	Name         string         `json:"name"`
-	Owner string `json:"owner"`
+	Owner        string         `json:"owner"`
 	Status       string         `json:"status"`
 	ReportNumber sql.NullString `json:"rpnumber"`
 	// Reports      string         `json:"report"`
@@ -162,27 +121,6 @@ type Task struct {
 	Max_checks             string         `json:"max_checks"`
 	Max_hosts              string         `json:"max_hosts"`
 }
-
-// type TaskInfo struct {
-// 	Name string `json:"name"`
-// 	Comment string `json:"comment"`
-// 	Target string `json:"target"`
-// 	Alert string `json:"alert"`
-// 	Schedule string `json:"schedule"`
-// 	In_assets string `json:"in_assets"`
-// 	Assets_apply_overrides string  `json:"assets_apply_overrides"`
-// 	Assets_min_qod string `json:"assets_min_qod"`
-// 	Alterable int `json:"alterable"`
-// 	Auto_delete string `json:"auto_delete"`
-// 	Auto_delete_data string `json:"auto_delete_data"`
-// 	Scanner int `json:"scanner"`
-// 	Config int `json:"config"`
-// 	Network string `json:"network"`
-// 	Hosts_ordering string `json:"hosts_ordering"`
-// 	Max_checks string `json:"max_checks"`
-// 	Max_hosts string `json:"max_hosts"`
-// }
-
 type Task_Targert struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
@@ -313,7 +251,7 @@ type Host struct {
 	Created    string         `json:"created"`
 	Modified   string         `json:"modified"`
 	Identifier []Identifiers  `json:"identifier"`
-	Owner string `json:"owner"`
+	Owner      string         `json:"owner"`
 }
 
 type Paginator struct {
@@ -424,7 +362,7 @@ func allTargets(w http.ResponseWriter, r *http.Request) {
 	page, err := strconv.Atoi(vars["page"])
 
 	var offset int
-	limit := 8
+	limit := 6
 	if page == 1 {
 		offset = 0
 	} else {
@@ -547,6 +485,7 @@ func createTarget(w http.ResponseWriter, r *http.Request) {
 	var modified = time.Now().Unix()
 	fmt.Println(target)
 	db.Exec("INSERT INTO targets(uuid,name,owner, hosts, reverse_lookup_only, reverse_lookup_unify, comment, port_list, alive_test, creation_time, modification_time) VALUES (?,?,(select id from users where id = ?),?,?,?,?,?,?,?,?)", &u, &target.Name, &owner, &target.Hosts, &target.RLOnly, &target.RLUnify, &target.Comment, &target.PortList, &target.AliveTest, &created, &modified)
+	fmt.Fprintf(w, "Tạo target thành công!")
 }
 
 func updateTarget(w http.ResponseWriter, r *http.Request) {
@@ -558,7 +497,7 @@ func updateTarget(w http.ResponseWriter, r *http.Request) {
 	var modified = time.Now().Unix()
 
 	db.Exec("UPDATE targets SET name = ?, hosts = ?, reverse_lookup_only = ?, reverse_lookup_unify= ?, comment = ?, port_list = ?, alive_test = ?, modification_time = ? WHERE id = ?", &target.Name, &target.Hosts, &target.RLOnly, &target.RLUnify, &target.Comment, &target.PortListID, &target.AliveTest, &modified, &targetId)
-
+	fmt.Fprintf(w, "Cập nhật thông tin thành công!")
 }
 
 func deleteTarget(w http.ResponseWriter, r *http.Request) {
@@ -654,7 +593,7 @@ func allTasks(w http.ResponseWriter, r *http.Request) {
 	page, err := strconv.Atoi(vars["page"])
 
 	var offset int
-	limit := 8
+	limit := 6
 	if page == 1 {
 		offset = 0
 	} else {
@@ -737,6 +676,7 @@ func createTask(w http.ResponseWriter, r *http.Request) {
 	var modified = time.Now().Unix()
 
 	db.Exec("with task as (insert into tasks(uuid, name, owner, comment, hidden, run_status, config, target, scanner, hosts_ordering, alterable, creation_time, modification_time) values (?,?,(select id from users where id=?),?,?,?,?,?,?,?,?,?,?) returning id) insert into task_preferences(task, name, value) values ((select id from task), 'max_checks', ?),((select id from task), 'max_hosts', ?),((select id from task), 'in_assets', ?),((select id from task), 'assets_apply_overrides', ?),((select id from task), 'assets_min_qod', ?),((select id from task), 'auto_delete', ?),((select id from task), 'auto_delete_data', ?)", &u, &task.Name, owner, &task.Comment, 0, 2, &task.Config, &task.Target, &task.Scanner, &task.Hosts_ordering, &task.Alterable, &created, &modified, &task.Max_checks, &task.Max_hosts, &task.In_assets, &task.Assets_apply_overrides, &task.Assets_min_qod, &task.Auto_delete, &task.Auto_delete_data)
+	fmt.Fprintf(w, "Tạo tác vụ thành công!")
 }
 
 func updateTask(w http.ResponseWriter, r *http.Request) {
@@ -747,7 +687,7 @@ func updateTask(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&task)
 	var modified = time.Now().Unix()
 	db.Exec("with t as (update tasks set name=?, comment=?, config=?, target=?, scanner=?, hosts_ordering=?, alterable=?, modification_time=? where id = ? returning id) update task_preferences set value = (case when name = 'max_checks' then ? when name = 'max_hosts' then ? when name = 'in_assets' then ? when name = 'assets_apply_overrides' then ? when name = 'assets_min_qod' then ? when name = 'auto_delete' then ? when name = 'auto_delete_data' then ? end) from t WHERE task = t.id", &task.Name, &task.Comment, &task.Config, &task.Target, &task.Scanner, &task.Hosts_ordering, &task.Alterable, &modified, &taskId, &task.Max_checks, &task.Max_hosts, &task.In_assets, &task.Assets_apply_overrides, &task.Assets_min_qod, &task.Auto_delete, &task.Auto_delete_data)
-	fmt.Fprintf(w, "Successfully Updated Task")
+	fmt.Fprintf(w, "Cập nhật thông tin thành công!")
 }
 
 func deleteTask(w http.ResponseWriter, r *http.Request) {
@@ -912,7 +852,7 @@ func allNvts(w http.ResponseWriter, r *http.Request) {
 	page, err := strconv.Atoi(vars["page"])
 
 	var offset int
-	limit := 5
+	limit := 4
 	if page == 1 {
 		offset = 0
 	} else {
@@ -943,10 +883,6 @@ func allNvts(w http.ResponseWriter, r *http.Request) {
 		}
 		nvt.Created = time.Unix(i, 0).Format(time.RFC850)
 		nvt.Modified = time.Unix(j, 0).Format(time.RFC850)
-		// nvt.Creation_time = time.Unix(nvt.Created, 0).Format(time.RFC850)
-		// // nvt.Creation_time.Format(time.RFC850)
-		// // nvt.Creation_time = nvt.Created.Format(time.RFC850))
-		// nvt.Modification_time = time.Unix(nvt.Modified, 0).Format(time.RFC850)
 		nvt.Cve = strings.Split(cve, ",")
 		for i := range nvt.Cve {
 			nvt.Cve[i] = strings.TrimSpace(nvt.Cve[i])
@@ -971,7 +907,7 @@ func searchNvts(w http.ResponseWriter, r *http.Request) {
 	page, err := strconv.Atoi(vars["page"])
 
 	var offset int
-	limit := 5
+	limit := 8
 	if page == 1 {
 		offset = 0
 	} else {
@@ -1019,10 +955,6 @@ func searchNvts(w http.ResponseWriter, r *http.Request) {
 }
 
 func getNvt(w http.ResponseWriter, r *http.Request) {
-	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
 	vars := mux.Vars(r)
 	nvtId := vars["id"]
 	// cpeName := vars["name"]
@@ -1104,7 +1036,7 @@ func allCves(w http.ResponseWriter, r *http.Request) {
 	page, err := strconv.Atoi(vars["page"])
 
 	var offset int
-	limit := 4
+	limit := 3
 	if page == 1 {
 		offset = 0
 	} else {
@@ -1166,7 +1098,7 @@ func searchCves(w http.ResponseWriter, r *http.Request) {
 	page, err := strconv.Atoi(vars["page"])
 
 	var offset int
-	limit := 4
+	limit := 8
 	if page == 1 {
 		offset = 0
 	} else {
@@ -1293,8 +1225,6 @@ func getCve(w http.ResponseWriter, r *http.Request) {
 
 func searchCpes(w http.ResponseWriter, r *http.Request) {
 	var cpes []Cpe
-	// var search string
-	// _ = json.NewDecoder(r.Body).Decode(&search)
 	vars := mux.Vars(r)
 	search := vars["search"]
 	page, err := strconv.Atoi(vars["page"])
@@ -1343,7 +1273,7 @@ func allCpes(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	page, err := strconv.Atoi(vars["page"])
 	var offset int
-	limit := 7
+	limit := 6
 	if page == 1 {
 		offset = 0
 	} else {
@@ -1440,16 +1370,12 @@ func getCpe(w http.ResponseWriter, r *http.Request) {
 }
 
 func allHosts(w http.ResponseWriter, r *http.Request) {
-	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
 	var hosts []Host
 	vars := mux.Vars(r)
 	page, err := strconv.Atoi(vars["page"])
 
 	var offset int
-	limit := 8
+	limit := 6
 	if page == 1 {
 		offset = 0
 	} else {
@@ -1491,10 +1417,6 @@ func allHosts(w http.ResponseWriter, r *http.Request) {
 }
 
 func getHost(w http.ResponseWriter, r *http.Request) {
-	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
 	vars := mux.Vars(r)
 	var hosts []Host
 	hostId := vars["id"]
@@ -1567,24 +1489,24 @@ func createHost(w http.ResponseWriter, r *http.Request) {
 	var u = uuid.Must(uuid.NewV4())
 	var created = time.Now().Unix()
 	var modified = time.Now().Unix()
-
-	db.Exec("INSERT INTO hosts(uuid, name, owner, comment, creation_time, modification_time) VALUES (?,?,(select id from users where id = ?),?,?,?)", &u, &host.Name, &owner, &host.Comment, &created, &modified)
-	// if err != nil {
-	// 	log.Print(err)
-	// 	return
-	// } else {
-	// 	fmt.Fprintf(w, "Create Successful")
-	// }
-
-	// db.Create(&target)
-
+	rows, err := db.Raw("SELECT count(*) FROM hosts WHERE name = ?", host.Name).Rows() // (*sql.Rows, error)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	var count int
+	for rows.Next() {
+		rows.Scan(&count)
+	}
+	if count > 0 {
+		fmt.Fprintf(w, "Host đã tồn tại")
+	} else {
+		db.Exec("INSERT INTO hosts(uuid, name, owner, comment, creation_time, modification_time) VALUES (?,?,(select id from users where id = ?),?,?,?)", &u, &host.Name, &owner, &host.Comment, &created, &modified)
+		fmt.Fprintf(w, "Tạo host thành công!")
+	}
 }
 
 func updateHost(w http.ResponseWriter, r *http.Request) {
-	// db, err := gorm.Open("postgres", "host=112.137.129.225 user=postgres dbname=gvmd password= sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
 	vars := mux.Vars(r)
 	hostId := vars["id"]
 
@@ -1593,7 +1515,7 @@ func updateHost(w http.ResponseWriter, r *http.Request) {
 	var modified = time.Now().Unix()
 
 	db.Exec("UPDATE hosts SET name = ?, comment = ?, modification_time = ? WHERE id = ?", &host.Name, &host.Comment, &modified, &hostId)
-
+	fmt.Fprintf(w, "Cập nhật thông tin thành công!")
 }
 
 func deleteHost(w http.ResponseWriter, r *http.Request) {
@@ -1658,11 +1580,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 }
 
 func allUser(w http.ResponseWriter, r *http.Request) {
-	// setupResponse(&w, r)
-	// db, err := gorm.Open("postgres", "user=postgres dbname=mydb password=19121997 sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
 	var users []User
 	vars := mux.Vars(r)
 	page, err := strconv.Atoi(vars["page"])
@@ -1732,14 +1649,8 @@ func getRoles(w http.ResponseWriter, r *http.Request) {
 }
 
 func createUser(w http.ResponseWriter, r *http.Request) {
-	// db, err := gorm.Open("postgres", "user=postgres dbname=mydb password=19121997 sslmode=disable")
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
 	var user User
 	_ = json.NewDecoder(r.Body).Decode(&user)
-	// user = append(user, person)
-	// json.NewEncoder(w).Encode(user)
 	owner, err := strconv.Atoi(user.Owner)
 	if err != nil {
 		fmt.Println("Error")
@@ -1754,7 +1665,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		rows.Scan(&count)
 	}
 	if count > 0 {
-		fmt.Fprintf(w, "User already exists")
+		fmt.Fprintf(w, "Người dùng đã tồn tại")
 	} else {
 		var u = uuid.Must(uuid.NewV4())
 		var created = time.Now().Unix()
@@ -1773,11 +1684,9 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println("Error")
 		}
-		// db.Exec("INSERT INTO users(uuid, name, comment, password, hosts, hosts_allow, ifaces, ifaces_allow, creation_time, modification_time) VALUES (?,?,?,?,?,?,?,?,?,?)", &u, &user.Name, &user.Comment, &user.Password, &user.Hosts, &Host_allow, &user.Ifaces, &Iface_allow, &created, &modified)
-		// db.Exec("INSERT INTO role_users(role, user) VALUES(?,SELECT id FROM users WHERE name = ?)", &role, &user.Name)
 		db.Exec("with userr as (insert into users(uuid, name, owner, comment, password, hosts, hosts_allow, ifaces, ifaces_allow, creation_time, modification_time) values (?,?,?,?,?,?,?,?,?,?,?) returning id) insert into role_users(role, \"user\") values ( ?, (select id from userr))", &u, &user.Name, owner, &user.Comment, &user.Password, &user.Hosts, &Host_allow, &user.Ifaces, &Iface_allow, &created, &modified, &role)
+		fmt.Fprintf(w, "Tạo người dùng thành công!")
 	}
-
 }
 
 func updateUser(w http.ResponseWriter, r *http.Request) {
@@ -1799,29 +1708,15 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("Error")
 	}
-	db.Exec("with userr as (update users set name= ?, comment = ?, password = ?, hosts = ?, hosts_allow = ?, ifaces = ?, ifaces_allow = ?, modification_time = ? where id = ? returning id) update role_users set role = ? from userr where \"user\" = userr.id", &user.Name, &user.Comment, &user.Password, &user.Hosts, &Host_allow, &user.Ifaces, &Iface_allow, &modified, &userId, &role)
-	fmt.Fprintf(w, "Successfully Updated User")
+	db.Exec("with userr as (update users set name= ?, comment = ?, hosts = ?, hosts_allow = ?, ifaces = ?, ifaces_allow = ?, modification_time = ? where id = ? returning id) update role_users set role = ? from userr where \"user\" = userr.id", &user.Name, &user.Comment, &user.Hosts, &Host_allow, &user.Ifaces, &Iface_allow, &modified, &userId, &role)
+	fmt.Fprintf(w, "Cập nhật thông tin thành công!")
 }
 func deleteUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["id"]
-
-	// db.Exec("DELETE FROM role_users WHERE user = ?", &userId)
-	// db.Exec("DELETE FROM users WHERE id = ?", &userId)
-	// db.Exec("DELETE ur FROM dbo.UserRoles ur INNER JOIN dbo.Roles r ON r.RoleId = ur.Role INNER JOIN dbo.Users u ON ur.user = u.id WHERE u.id = ?", &userId)
-	// db.Exec("INSERT INTO role_users_trash(role, \"user\") SELECT role, \"user\" FROM role_users WHERE \"user\" = ?", &userId)
 	db.Exec("DELETE FROM role_users WHERE \"user\" = ?", &userId)
 	db.Exec("DELETE FROM users WHERE id = ?", &userId)
 }
-
-// func handleRequests() {
-
-// }
-// func setupResponse(w *http.ResponseWriter, req *http.Request) {
-// 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-// 	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-// 	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-// }
 
 func main() {
 	// Handle Subsequent requests
@@ -1830,7 +1725,7 @@ func main() {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	initialMigration()
+	// initialMigration()
 	// allowedHeaders := handlers.AllowedHeaders([]string{"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"})
 	// allowedOrigins := handlers.AllowedOrigins([]string{"*"})
 	// allowedMethods := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
@@ -1889,8 +1784,5 @@ func main() {
 	myRouter.HandleFunc("/host/{id}", updateHost).Methods("PUT")
 	myRouter.HandleFunc("/host/{id}", deleteHost).Methods("DELETE")
 	myRouter.HandleFunc("/portlist", allPortList).Methods("GET")
-	// corsObj := handlers.AllowedOrigins([]string{"*"})
-	// http.ListenAndServe(":8081", handlers.CORS(corsObj)(myRouter))
-	// http.ListenAndServe(":8081", handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(myRouter))
 	log.Fatal(http.ListenAndServe(":8081", handlers.CORS(handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}), handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "DELETE", "OPTIONS"}), handlers.AllowedOrigins([]string{"*"}))(myRouter)))
 }

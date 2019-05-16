@@ -7,7 +7,7 @@
             <span class="modal-header__title">
               Sửa đổi Host
             </span>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>  
+            <button type="button" class="close" @click="closeForm()" data-dismiss="modal">&times;</button>  
           </div>
           <div class="modal-body">   
               <form v-on:submit.prevent="updateHost(hostData.id)" class="update-host" style="padding: 0px">
@@ -24,7 +24,9 @@
               </form>
           </div>
           <div class="modal-footer">
-            <button type="submit" @click="updateHost()" class="btn btn-primary">Lưu</button>
+            <!-- <button class="btn btn-danger" v-if="message">{{message}}</button> -->
+            <button class="btn btn-success" v-if="messageUpdate">{{messageUpdate}}</button>
+            <button type="submit" @click="updateHost(hostData.id)" class="btn btn-primary">Lưu</button>
           </div>
         </div>
       </div>
@@ -40,6 +42,7 @@
       return {
         // name: '',
         // comment: ''
+        messageUpdate: ''
       }
     },
     methods: {
@@ -55,10 +58,16 @@
               }
             })
             .then(response => {
-              this.$router.push('/hosts')
+              if (response.data === 'Cập nhật thông tin thành công!') {
+                this.messageUpdate = response.data
+                location.reload()
+              }
             })
           }
         })
+      },
+      closeForm() {
+        this.messageUpdate = ''
       }
     }
   }
@@ -75,8 +84,5 @@
 
 #updateHost label{
     min-width: 125px;
-}
-#updateHost button.btn-primary{
-  margin-top: 20px;
 }
 </style>

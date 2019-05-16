@@ -7,7 +7,7 @@
             <span class="modal-header__title">
               Tạo mới Host
             </span>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>  
+            <button type="button" class="close" data-dismiss="modal" @click="closeForm()">&times;</button>  
           </div>
           <div class="modal-body">   
               <form v-on:submit.prevent="createHost" class="create-host" style="padding: 0px">
@@ -24,7 +24,9 @@
               </form>
           </div>
           <div class="modal-footer">
-              <button type="submit" @click="createHost()" class="btn btn-primary" >Lưu</button>
+            <button class="btn btn-danger" v-if="message">{{message}}</button>
+            <button class="btn btn-success" v-if="messageCreate">{{messageCreate}}</button>
+            <button type="submit" @click="createHost" class="btn btn-primary" >Lưu</button>
           </div>
         </div>
       </div>
@@ -39,7 +41,9 @@
       return {
         name: '',
         comment: '',
-        isModalVisible: true
+        isModalVisible: true,
+        messageCreate: '',
+        message: ''
       }
     },
     methods: {
@@ -56,10 +60,20 @@
               }
             })
             .then(response => {
-              this.isModalVisible = false
+              if (response.data === 'Host đã tồn tại') {
+                this.message = response.data
+              }
+              if (response.data === 'Tạo host thành công!') {
+                this.messageCreate = response.data
+                location.reload()
+              }
             })
           }
         })
+      },
+      closeForm() {
+        this.message = ''
+        this.messageCreate = ''
       }
       // closeModel() {
       //   this.isModalVisible = false

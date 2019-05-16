@@ -38,8 +38,8 @@
                         <td>{{i.value}}</td>
                         <td>{{i.created}}</td>
                         <td>
-                          <span>{{ $t('hosts.reportMsg') }} &nbsp; &nbsp;<router-link :to="{ name: 'Báo cáo', params: {id: i.source.report}}">{{i.source.report}}</router-link></span>
-                          <span v-if='i.source.nvt !=""'>(NTV  &nbsp; &nbsp;<router-link :to="{ name: 'Chi tiết NVT', params: {id: i.source.nvt }}">{{i.source.nvt}}</router-link>)</span>
+                          <span style="display: flex">{{ $t('hosts.reportMsg') }} &nbsp; &nbsp;<router-link :to="{ name: 'Báo cáo', params: {id: i.source.report}}">{{i.source.report}}</router-link></span>
+                          <span v-if='i.source.nvt !=""'>(NVT  &nbsp; &nbsp;<router-link :to="{ name: 'Chi tiết NVT', params: {id: i.source.nvt }}">{{i.source.nvt}}</router-link>)</span>
                         </td>
                       </tr>
                     </tbody>

@@ -39,7 +39,7 @@
     <li class="treeview">
       <a href="#">
         <i class="fa fa-folder-o"></i>
-        <span class="treeview-title">Tập mô hình mẫu</span>
+        <span class="treeview-title">Tập dữ liệu mẫu</span>
         <span class="pull-right-container pull-right">
           <i class="fa fa-angle-left fa-fw"></i>
         </span>

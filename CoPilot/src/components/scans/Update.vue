@@ -7,7 +7,7 @@
             <span class="modal-header__title">
               Sửa đổi tác vụ
             </span>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>  
+            <button type="button" class="close" @click="closeForm()" data-dismiss="modal">&times;</button>  
           </div>
           <div class="modal-body">   
             <form v-on:submit.prevent="updateTask(taskData.id)" class="update-task" style="padding: 0px">
@@ -101,6 +101,7 @@
             </form>
           </div>
           <div class="modal-footer">
+            <button class="btn btn-success" v-if="messageUpdate">{{messageUpdate}}</button>
             <button type="submit" @click="updateTask(taskData.id)" class="modal-submit btn btn-primary">Lưu</button>
           </div>
         </div>
@@ -130,7 +131,8 @@
       return {
         targets: [],
         scanners: [],
-        configs: []
+        configs: [],
+        messageUpdate: ''
         // // name: '',
         // comment: '',
         // // target: '',
@@ -223,11 +225,16 @@
               }
             })
             .then(response => {
-              // // this.$router.push('/targets')
-              // this.$router.go(0)
+              if (response.data === 'Cập nhật thông tin thành công!') {
+                this.messageUpdate = response.data
+                location.reload()
+              }
             })
           }
         })
+      },
+      closeForm() {
+        this.messageUpdate = ''
       }
     }
   }

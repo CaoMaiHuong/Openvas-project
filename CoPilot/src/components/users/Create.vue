@@ -15,7 +15,6 @@
                   <label class="control-label" for="name">{{ $t('users.nameMsg') }}</label>
                   <input class="form-control" ref="name" v-model="name" name="name" v-validate="'required'" type="text">
                   <span v-if="errors.has('name')">{{ errors.first('name') }}</span>
-                  <span v-if="message">{{message}}</span>
                 </div>
                 <div class="form-group">
                   <label class="control-label" for="comment">{{ $t('commentMsg') }}</label>
@@ -65,6 +64,8 @@
               </form>
           </div>
           <div class="modal-footer">
+            <button class="btn btn-danger" v-if="message">{{message}}</button>
+            <button class="btn btn-success" v-if="messageCreate">{{messageCreate}}</button>
             <button type="submit" @click="createUser()" class="btn btn-primary">Lưu</button>
           </div>
         </div>
@@ -89,7 +90,8 @@
         iface_allow_number: '0',
         ifaces: [],
         roles: [],
-        message: ''
+        message: '',
+        messageCreate: ''
       }
     },
     created() {
@@ -130,13 +132,21 @@
               }
             })
             .then(response => {
-              this.message = response.data
-              // if (this.message !== 'User already exists') {
-              //   this.$router.push('/users')
-              // }
+              if (response.data === 'Người dùng đã tồn tại') {
+                this.message = response.data
+              }
+              if (response.data === 'Tạo người dùng thành công!') {
+                this.messageCreate = response.data
+                this.message = ''
+                location.reload()
+              }
             })
           }
         })
+      },
+      closeForm() {
+        this.message = ''
+        this.messageCreate = ''
       }
     }
   }

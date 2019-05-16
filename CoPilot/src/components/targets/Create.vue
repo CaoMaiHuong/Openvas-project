@@ -7,7 +7,7 @@
             <span class="modal-header__title">
               Tạo mới target
             </span>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>  
+            <button type="button" class="close" data-dismiss="modal" @click="closeForm()">&times;</button>  
           </div>
           <div class="modal-body">   
               <form v-on:submit.prevent="createTarget" class="create-user" style="padding: 0px">
@@ -60,6 +60,7 @@
               </form>
           </div>
           <div class="modal-footer">
+            <button class="btn btn-success" v-if="messageCreate">{{messageCreate}}</button>
            <button type="submit" @click="createTarget()" class="btn btn-primary button-save">Lưu</button>
           </div>
         </div>
@@ -81,7 +82,8 @@
         portlist: '1',
         alivetest: '0',
         rlonly: '0',
-        rlunify: '0'
+        rlunify: '0',
+        messageCreate: ''
       }
     },
     mounted() {
@@ -112,11 +114,16 @@
               }
             })
             .then(response => {
-              // // this.$router.push('/targets')
-              // this.$router.go(0)
+              if (response.data === 'Tạo target thành công!') {
+                this.messageCreate = response.data
+                location.reload()
+              }
             })
           }
         })
+      },
+      closeForm() {
+        this.messageCreate = ''
       }
     }
   }

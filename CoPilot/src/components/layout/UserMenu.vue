@@ -18,7 +18,7 @@
       <li class="user-footer">
         <a href="javascript:;" class="btn btn-default btn-flat btn-block">
           <i class="fa fa-sign-out"></i>
-          <span @click="logOut()">Logout</span>
+          <span @click="logOut()">Đăng xuất</span>
         </a>
       </li>
     </ul>
@@ -31,7 +31,8 @@ export default {
   props: ['user'],
   methods: {
     logOut() {
-      localStorage.removeItem('email')
+      localStorage.removeItem('name')
+      localStorage.removeItem('id')
       this.$router.push('/login')
     }
   }
